@@ -1,0 +1,132 @@
+module IPsec {
+    yang-version 1;
+    namespace "urn:opendaylight:params:xml:ns:yang:ipsec";
+    prefix "ipsec";
+
+    revision "2015-01-05" {
+        description "Initial revision of ipsec model";
+    }
+
+    grouping netaddress {
+        leaf address {
+            type string;
+        }
+        leaf mask {
+            type int32;
+        }
+    }
+
+    grouping action {
+        leaf actionType {
+            type int32;
+        }
+        leaf actionExtra {
+            type string;
+        }
+    }
+
+    container connection {
+        leaf id {
+            type string;
+        }
+        leaf keyexchange {
+            type string;
+        }
+        leaf ike {
+            type string;
+        }
+        leaf ah {
+            type string;
+        }
+        leaf esp {
+            type string;
+        }
+        leaf left {
+            type string;
+        }
+        leaf leftid {
+            type string;
+        }
+        container leftsubnet {
+            uses netaddress;
+        }
+        leaf leftcert {
+            type string;
+        }
+        leaf leftfirewall {
+            type string;
+        }
+        leaf right {
+            type string;
+        }
+        leaf rightid {
+            type string;
+        }
+        container lrightsubnet {
+            uses netaddress;
+        }
+        leaf rightcert {
+            type string;
+        }
+        leaf rightfirewall {
+            type string;
+        }
+        leaf auto {
+            type string;
+        }
+    }
+
+    container rule {
+        leaf id {
+            type string;
+        }
+        container src-subnet {
+            uses netaddress;
+        }
+        container dst-subnet {
+            uses netaddress;
+        }
+        container action {
+            uses action;
+        }
+    }
+
+    container secret {
+        leaf secret {
+            type string;
+        }
+    }
+
+    rpc conn-add {
+        input {
+            container connection;
+        }
+        output {
+            leaf return {
+                type string;
+            }
+        }
+    }
+
+    rpc rule-add {
+        input {
+            container rule;
+        }
+        output {
+            leaf return {
+                type string;
+            }
+        }
+    }
+
+    rpc sec-add {
+        input {
+            container secret;
+        }
+        output {
+            leaf return {
+                type string;
+            }
+        }
+    }
+}
