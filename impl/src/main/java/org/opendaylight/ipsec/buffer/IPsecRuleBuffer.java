@@ -12,7 +12,7 @@ import org.opendaylight.ipsec.domain.IPsecGateway;
 import org.opendaylight.ipsec.domain.IPsecRule;
 import org.opendaylight.ipsec.domain.IPsecSecret;
 
-import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Vector;
 
@@ -40,7 +40,13 @@ public class IPsecRuleBuffer {
         return rules;
     }
 
-    public static IPsecRule lookup(Inet4Address from, Inet4Address to) {
+    /**
+     * Look up rules.
+     * @param from source address
+     * @param to destination address
+     * @return rule found, null for none
+     */
+    public static IPsecRule lookup(InetAddress from, InetAddress to) {
         for (IPsecRule rule : rules) {
             if (rule.match(from, to))
                 return rule;

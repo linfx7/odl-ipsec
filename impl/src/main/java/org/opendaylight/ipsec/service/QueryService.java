@@ -5,16 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.ipsec.utils.tcp;
+package org.opendaylight.ipsec.service;
 
-import java.net.InetAddress;
-
-public interface TCPClientCallback {
-
-    /**
-     * Used to deal with response from service.
-     * @param address remote address
-     * @param response remote response
-     */
-    public void deal(InetAddress address, byte[] response);
+public class QueryService {
 }

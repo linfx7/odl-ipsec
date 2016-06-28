@@ -7,12 +7,14 @@
  */
 package org.opendaylight.ipsec.utils.tcp;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import org.opendaylight.ipsec.utils.ByteTools;
+
+import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import static org.opendaylight.ipsec.utils.Flags.*;
 
 public class TCPServer {
 
@@ -76,13 +78,18 @@ public class TCPServer {
 
         public void run() {
             try {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
-                // response the request
-                printWriter.print(callback.respond(bufferedReader.readLine()));
-                printWriter.flush();
-                printWriter.close();
-                bufferedReader.close();
+                // get request bytes
+                InetAddress remote = socket.getInetAddress();
+                InputStream inputStream = socket.getInputStream();
+                byte[] request = ByteTools.readStream(inputStream);
+                // send response bytes
+                OutputStream outputStream = socket.getOutputStream();
+                ByteTools.writeStream(outputStream, new byte[] {request[0], request[1], ACK});
+                outputStream.flush();
+                outputStream.close();
+                inputStream.close();
+                // call the callback interface
+                callback.respond(remote, request);
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -101,8 +108,9 @@ public class TCPServer {
     public static void main(String[] args) {
         TCPServer server = new TCPServer(1919, new TCPServerCallback() {
             @Override
-            public String respond(String request) {
-                return "Hello " + request + ".";
+            public void respond(InetAddress from, byte[] request) {
+                String res = "Hello "+new String(request)+".";
+                System.out.println(res);
             }
         });
         server.start();

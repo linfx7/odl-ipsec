@@ -7,26 +7,29 @@ module IPsec {
         description "Initial revision of ipsec model";
     }
 
-    grouping netaddress {
-        leaf address {
+    grouping src-netaddress {
+        leaf src-address {
             type string;
         }
-        leaf mask {
-            type int32;
+        leaf src-mask {
+            type int8;
         }
     }
 
-    grouping action {
-        leaf actionType {
-            type int32;
-        }
-        leaf actionExtra {
+    grouping dst-netaddress {
+        leaf dst-address {
             type string;
+        }
+        leaf dst-mask {
+            type int8;
         }
     }
 
-    container connection {
-        leaf id {
+    grouping connection {
+        leaf connection-type {
+            type string;
+        }
+        leaf name {
             type string;
         }
         leaf keyexchange {
@@ -41,14 +44,17 @@ module IPsec {
         leaf esp {
             type string;
         }
+        leaf authby {
+            type string;
+        }
         leaf left {
             type string;
         }
         leaf leftid {
             type string;
         }
-        container leftsubnet {
-            uses netaddress;
+        leaf leftsubnet {
+            type string;
         }
         leaf leftcert {
             type string;
@@ -62,8 +68,8 @@ module IPsec {
         leaf rightid {
             type string;
         }
-        container lrightsubnet {
-            uses netaddress;
+        leaf rightsubnet {
+            type string;
         }
         leaf rightcert {
             type string;
@@ -76,22 +82,21 @@ module IPsec {
         }
     }
 
-    container rule {
-        leaf id {
+    grouping rule {
+        leaf pos {
+            type int32;
+        }
+        uses src-netaddress;
+        uses dst-netaddress;
+        leaf action {
+            type int32;
+        }
+        leaf connection-name {
             type string;
-        }
-        container src-subnet {
-            uses netaddress;
-        }
-        container dst-subnet {
-            uses netaddress;
-        }
-        container action {
-            uses action;
         }
     }
 
-    container secret {
+    grouping secret {
         leaf secret {
             type string;
         }
@@ -99,7 +104,7 @@ module IPsec {
 
     rpc conn-add {
         input {
-            container connection;
+            uses connection;
         }
         output {
             leaf return {
@@ -110,7 +115,7 @@ module IPsec {
 
     rpc rule-add {
         input {
-            container rule;
+            uses rule;
         }
         output {
             leaf return {
@@ -121,7 +126,7 @@ module IPsec {
 
     rpc sec-add {
         input {
-            container secret;
+            uses secret;
         }
         output {
             leaf return {

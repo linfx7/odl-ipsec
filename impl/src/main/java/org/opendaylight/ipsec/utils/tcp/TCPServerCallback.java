@@ -7,12 +7,14 @@
  */
 package org.opendaylight.ipsec.utils.tcp;
 
+import java.net.InetAddress;
+
 public interface TCPServerCallback {
 
     /**
      * To respond request from client.
+     * @param from source address of the request
      * @param request request string from client
-     * @return response
      */
-    public String respond(String request);
+    public void respond(InetAddress from, byte[] request);
 }

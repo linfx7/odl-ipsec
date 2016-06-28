@@ -7,14 +7,19 @@
  */
 package org.opendaylight.ipsec.domain;
 
-import java.net.Inet4Address;
+import java.net.InetAddress;
+
+import static org.opendaylight.ipsec.utils.Flags.RULE_BYPASS;
+import static org.opendaylight.ipsec.utils.Flags.RULE_DISCARD;
+import static org.opendaylight.ipsec.utils.Flags.RULE_PROTECT;
 
 public class IPsecRule {
-    private Inet4Address source;
-    private int srcPrefixLen;
-    private Inet4Address destination;
-    private int dstPrefixLen;
+    private InetAddress source;
+    private byte srcPrefixLen;
+    private InetAddress destination;
+    private byte dstPrefixLen;
     private int action;
+    private String connectionName;
 
     /**
      * construct an IPsec rule
@@ -22,46 +27,49 @@ public class IPsecRule {
      * @param sourcePrefixLength prefix length for source ip
      * @param destination destination ip address
      * @param destinationPrefixLength prefix length for destination ip
-     * @param action what to do with the packet: -1: discard, -2: forward without process, 0 1 2 ... : forward with IPsec, number indicate the connnection to use
+     * @param action what to do with the packet: -1: discard, -2: forward without process, 0: protect with IPsec
+     * @param connectionName IPsec connection name, used when action is 0
      */
-    public IPsecRule(Inet4Address source, int sourcePrefixLength,
-                     Inet4Address destination, int destinationPrefixLength, int action) {
+    public IPsecRule(InetAddress source, byte sourcePrefixLength,
+                     InetAddress destination, byte destinationPrefixLength,
+                     int action, String connectionName) {
         this.source = source;
         this.srcPrefixLen = sourcePrefixLength;
         this.destination = destination;
         this.dstPrefixLen = destinationPrefixLength;
         this.action = action;
+        this.connectionName = connectionName;
     }
 
-    public Inet4Address getSource() {
+    public InetAddress getSource() {
         return source;
     }
 
-    public void setSource(Inet4Address source) {
+    public void setSource(InetAddress source) {
         this.source = source;
     }
 
-    public int getSrcPrefixLen() {
+    public byte getSrcPrefixLen() {
         return srcPrefixLen;
     }
 
-    public void setSrcPrefixLen(int srcPrefixLen) {
+    public void setSrcPrefixLen(byte srcPrefixLen) {
         this.srcPrefixLen = srcPrefixLen;
     }
 
-    public Inet4Address getDestination() {
+    public InetAddress getDestination() {
         return destination;
     }
 
-    public void setDestination(Inet4Address destination) {
+    public void setDestination(InetAddress destination) {
         this.destination = destination;
     }
 
-    public int getDstPrefixLen() {
+    public byte getDstPrefixLen() {
         return dstPrefixLen;
     }
 
-    public void setDstPrefixLen(int dstPrefixLen) {
+    public void setDstPrefixLen(byte dstPrefixLen) {
         this.dstPrefixLen = dstPrefixLen;
     }
 
@@ -73,15 +81,43 @@ public class IPsecRule {
         this.action = action;
     }
 
+    public String getConnectionName() {
+        return connectionName;
+    }
+
+    public void setConnectionName(String connectionName) {
+        this.connectionName = connectionName;
+    }
+
     /**
      * If the from to pair match the rule.
      * @param from source address
      * @param to destination address
      * @return match result
      */
-    public boolean match(Inet4Address from, Inet4Address to) {
+    public boolean match(InetAddress from, InetAddress to) {
         return matchBits(from.getAddress(), source.getAddress(), srcPrefixLen)
                 && matchBits(to.getAddress(), destination.getAddress(), dstPrefixLen);
+    }
+
+    /**
+     * Get rule bytes.
+     * @return 11 bytes
+     */
+    public byte[] toByteArray() {
+        byte[] result = new byte[11];
+        System.arraycopy(source.getAddress(), 0, result, 0, 4);
+        result[4] = srcPrefixLen;
+        System.arraycopy(destination.getAddress(), 0, result, 5, 4);
+        result[9] = dstPrefixLen;
+        if (action == -1) {
+            result[10] = RULE_DISCARD;
+        } else if (action == -2) {
+            result[10] = RULE_BYPASS;
+        } else if (action >= 0) {
+            result[10] = RULE_PROTECT;
+        }
+        return result;
     }
 
     /**
@@ -91,7 +127,7 @@ public class IPsecRule {
      * @param len length of the array
      * @return match result
      */
-    private static boolean matchBits(byte[] a, byte[] b, int len) {
+    private static boolean matchBits(byte[] a, byte[] b, byte len) {
         int numOfBytes = len / 8, rest = len % 8;
         for (int i = 0; i < numOfBytes; ++i) {
             if (a[i] != b[i])
@@ -103,7 +139,6 @@ public class IPsecRule {
         }
         return true;
     }
-
 
 /*
     *//**

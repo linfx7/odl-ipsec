@@ -16,21 +16,38 @@ import java.util.Map;
 import java.util.Vector;
 
 public class IPsecConnectionBuffer {
-    private static Map<String, IPsecConnection> connections = new Hashtable<>();
+    private static Map<String, IPsecConnection> passiveConnections = new Hashtable<>();
+    private static Map<String, IPsecConnection> activeConnections = new Hashtable<>();
 
-    public static void add() {
-
+    public static void addPassive(String name, IPsecConnection connection) {
+        passiveConnections.put(name, connection);
     }
 
-    public static void remove() {
-
+    public static void addActive(String name, IPsecConnection connection) {
+        activeConnections.put(name, connection);
     }
 
-    public static void update() {
-
+    public static void removePassive(String name) {
+        passiveConnections.remove(name);
     }
 
-    public static IPsecRule lookup() {
-        return null;
+    public static void removeActive(String name) {
+        activeConnections.remove(name);
+    }
+
+    public static void updatePassive(String name, IPsecConnection connection) {
+        passiveConnections.put(name, connection);
+    }
+
+    public static void updateActive(String name, IPsecConnection connection) {
+        activeConnections.put(name, connection);
+    }
+
+    public static IPsecConnection getPassiveByName(String name) {
+        return passiveConnections.get(name);
+    }
+
+    public static IPsecConnection getActiveByName(String name) {
+        return activeConnections.get(name);
     }
 }
