@@ -9,7 +9,9 @@ package org.opendaylight.ipsec.utils.tcp;
 
 import org.opendaylight.ipsec.utils.ByteTools;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;

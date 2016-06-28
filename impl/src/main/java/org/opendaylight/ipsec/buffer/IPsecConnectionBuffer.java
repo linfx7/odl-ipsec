@@ -8,22 +8,21 @@
 package org.opendaylight.ipsec.buffer;
 
 import org.opendaylight.ipsec.domain.IPsecConnection;
-import org.opendaylight.ipsec.domain.IPsecRule;
 
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 public class IPsecConnectionBuffer {
     private static Map<String, IPsecConnection> passiveConnections = new Hashtable<>();
     private static Map<String, IPsecConnection> activeConnections = new Hashtable<>();
 
     public static void addPassive(String name, IPsecConnection connection) {
+        System.out.println("passive connection: " + connection.toString());
         passiveConnections.put(name, connection);
     }
 
     public static void addActive(String name, IPsecConnection connection) {
+        System.out.println("active connection: " + connection.toString());
         activeConnections.put(name, connection);
     }
 

@@ -7,10 +7,7 @@
  */
 package org.opendaylight.ipsec.buffer;
 
-import org.opendaylight.ipsec.domain.IPsecConnection;
-import org.opendaylight.ipsec.domain.IPsecGateway;
 import org.opendaylight.ipsec.domain.IPsecRule;
-import org.opendaylight.ipsec.domain.IPsecSecret;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -20,6 +17,7 @@ public class IPsecRuleBuffer {
     private static List<IPsecRule> rules = new Vector<>();
 
     public static void add(IPsecRule rule) {
+        System.out.println("rule: " + rule.toString());
         rules.add(rule);
     }
 

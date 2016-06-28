@@ -11,9 +11,7 @@ import org.opendaylight.ipsec.domain.IPsecRule;
 import org.opendaylight.ipsec.domain.IPsecSecret;
 
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 public class IPsecSecretBuffer {
     private static Map<String, IPsecSecret> secrets = new Hashtable<>();

@@ -11,7 +11,6 @@ import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker.ProviderContext;
 import org.opendaylight.controller.sal.binding.api.BindingAwareProvider;
 import org.opendaylight.ipsec.communication.IPsecNotificationServerThread;
-import org.opendaylight.ipsec.domain.IPsecSecret;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ipsec.rev150105.IPsecService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

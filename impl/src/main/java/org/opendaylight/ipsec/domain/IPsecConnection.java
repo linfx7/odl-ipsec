@@ -203,4 +203,26 @@ public class IPsecConnection {
     public void setAuto(String auto) {
         this.auto = auto;
     }
+
+    @Override
+    public String toString() {
+        return "IPsecConnection{" +
+                "keyexchange='" + keyexchange + '\'' +
+                ", ike='" + ike + '\'' +
+                ", ah='" + ah + '\'' +
+                ", esp='" + esp + '\'' +
+                ", authby='" + authby + '\'' +
+                ", left='" + left + '\'' +
+                ", right='" + right + '\'' +
+                ", leftid='" + leftid + '\'' +
+                ", rightid='" + rightid + '\'' +
+                ", leftcert='" + leftcert + '\'' +
+                ", rightcert='" + rightcert + '\'' +
+                ", leftsubnet='" + leftsubnet + '\'' +
+                ", rightsubnet='" + rightsubnet + '\'' +
+                ", leftfirewall='" + leftfirewall + '\'' +
+                ", rightfirewall='" + rightfirewall + '\'' +
+                ", auto='" + auto + '\'' +
+                '}';
+    }
 }

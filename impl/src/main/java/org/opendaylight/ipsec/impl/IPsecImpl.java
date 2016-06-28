@@ -19,7 +19,6 @@ import org.opendaylight.yangtools.yang.common.RpcResult;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.Future;
 

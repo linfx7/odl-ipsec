@@ -9,9 +9,7 @@ package org.opendaylight.ipsec.domain;
 
 import java.net.InetAddress;
 
-import static org.opendaylight.ipsec.utils.Flags.RULE_BYPASS;
-import static org.opendaylight.ipsec.utils.Flags.RULE_DISCARD;
-import static org.opendaylight.ipsec.utils.Flags.RULE_PROTECT;
+import static org.opendaylight.ipsec.utils.Flags.*;
 
 public class IPsecRule {
     private InetAddress source;
@@ -168,4 +166,16 @@ public class IPsecRule {
         byte[] b = toBits(8);
         System.out.print(b[0]);
     }*/
+
+    @Override
+    public String toString() {
+        return "IPsecRule{" +
+                "source=" + source +
+                ", srcPrefixLen=" + srcPrefixLen +
+                ", destination=" + destination +
+                ", dstPrefixLen=" + dstPrefixLen +
+                ", action=" + action +
+                ", connectionName='" + connectionName + '\'' +
+                '}';
+    }
 }
