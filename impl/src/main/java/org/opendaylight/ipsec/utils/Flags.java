@@ -12,7 +12,7 @@ public class Flags {
     // message type
     public static final byte NOTIFICATION = (byte) 0x80;
     public static final byte CONFIGURATION = (byte) 0x40;
-    public static final byte QURERY = (byte) 0x20;
+    public static final byte QUERY = (byte) 0x20;
 
 
     // notification type

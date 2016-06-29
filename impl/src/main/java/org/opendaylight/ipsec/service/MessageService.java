@@ -24,7 +24,7 @@ public class MessageService {
             NotificationService.handleNotification(from, ByteTools.subByteArray(request, 2, request.length));
         } else if (request[0] == CONFIGURATION) {
             ConfigurationService.handleResponse(from, ByteTools.subByteArray(request, 2, request.length));
-        } else if (request[0] == QURERY) {
+        } else if (request[0] == QUERY) {
 
         }
     }
