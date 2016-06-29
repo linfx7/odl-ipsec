@@ -14,14 +14,16 @@ import org.opendaylight.ipsec.utils.tcp.TCPServerCallback;
 
 import java.net.InetAddress;
 
-public class IPsecNotificationServerThread extends Thread {
+import static java.lang.Thread.sleep;
+
+public class IPsecNotificationServer {
 
     private TCPServer server;
 
     /**
-     * Construct an IPsecNotificationServerThread.
+     * Construct an IPsecNotificationServer.
      */
-    public IPsecNotificationServerThread() {
+    public IPsecNotificationServer() {
         server = new TCPServer(1919, new TCPServerCallback() {
             @Override
             public void respond(InetAddress from, byte[] request) {
@@ -33,14 +35,25 @@ public class IPsecNotificationServerThread extends Thread {
     /**
      * start the ipsec control service
      */
-    public void run() {
+    public void start() {
         server.start();
     }
 
     /**
      * stop safely
      */
-    public void safeStop() {
+    public void stop() {
+        server.safeStop();
+    }
+
+    public static void main(String[] args) {
+        IPsecNotificationServer server = new IPsecNotificationServer();
+        server.start();
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         server.stop();
     }
 

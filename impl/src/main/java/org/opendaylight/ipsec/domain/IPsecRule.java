@@ -138,35 +138,6 @@ public class IPsecRule {
         return true;
     }
 
-/*
-    *//**
-     * Convert net prefix length to net mask.
-     * @param prefixLength prefix length
-     * @return net mask in bytes
-     *//*
-    private static byte[] toBits(int prefixLength) {
-        byte[] bytes = {(byte) 0x00,
-                (byte) 0x80, (byte) 0xc0, (byte) 0xe0, (byte) 0xf0,
-                (byte) 0xf8, (byte) 0xfc, (byte) 0xfe, (byte) 0xff};
-        byte[] result = new byte[4];
-        int numOfBytes = prefixLength / 8, rest = prefixLength % 8;
-        for (int i = 0; i < numOfBytes; ++i) {
-            result[i] = (byte) 0xff;
-        }
-        if (numOfBytes < 4) {
-            result[numOfBytes] = bytes[rest];
-        }
-        for (int i = numOfBytes + 1; i < 4; ++i) {
-            result[i] = (byte) 0x00;
-        }
-        return result;
-    }
-
-    public static void main(String[] args) {
-        byte[] b = toBits(8);
-        System.out.print(b[0]);
-    }*/
-
     @Override
     public String toString() {
         return "IPsecRule{" +

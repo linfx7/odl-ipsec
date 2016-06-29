@@ -18,11 +18,12 @@ import java.net.Socket;
 
 import static org.opendaylight.ipsec.utils.Flags.ACK;
 
-public class TCPServer {
+public class TCPServer extends Thread {
 
     private int serverPort;
     private TCPServerCallback callback;
     private boolean running;
+    ServerSocket serverSocket = null;
 
     /**
      * Construct a TCP service.
@@ -37,33 +38,36 @@ public class TCPServer {
     /**
      * Start the service.
      */
-    public void start() {
-        ServerSocket serverSocket = null;
-        Socket socket = null;
+    public void run() {
+        Socket socket;
+
         try {
             serverSocket = new ServerSocket(serverPort);
             running = true;
             while (running) {
-                socket = serverSocket.accept();
-                ChildThread childThread = new ChildThread(socket, callback);
-                childThread.run();
+                try {
+                    socket = serverSocket.accept();
+                    ChildThread childThread = new ChildThread(socket, callback);
+                    childThread.start();
+                } catch (IOException e) {
+                    // actively close
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                // close the serversocket, the accepted socket will be closed by the chile thread
-                if (serverSocket != null) {
-                    serverSocket.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
-    public void stop() {
+    public void safeStop() {
         running = false;
+        try {
+            // close the serversocket
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

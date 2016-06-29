@@ -36,7 +36,7 @@ public class TCPClient {
      * @param callback handleMessage the return value
      */
     public void send(byte[] request, TCPClientCallback callback) {
-        new SendThread(address, port, request, callback).run();
+        new SendThread(address, port, request, callback).start();
     }
 
     class SendThread extends Thread {
