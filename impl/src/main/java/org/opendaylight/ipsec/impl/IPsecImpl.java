@@ -30,7 +30,11 @@ public class IPsecImpl implements IPsecService {
             InetAddress dstAddress = InetAddress.getByName(input.getSrcAddress());
             IPsecRule rule = new IPsecRule(srcAddress, input.getSrcMask(), dstAddress, input.getDstMask(),
                     input.getAction(), input.getConnectionName());
-            IPsecRuleBuffer.add(input.getPos(), rule);
+            if (input.getPos() != null) {
+                IPsecRuleBuffer.add(input.getPos(), rule);
+            } else {
+                IPsecRuleBuffer.add(rule);
+            }
             // return result
             RuleAddOutputBuilder builder = new RuleAddOutputBuilder();
             builder.setReturn("\"result\":\"success\"");
