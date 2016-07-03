@@ -60,15 +60,20 @@ public class IPsecImpl implements IPsecService {
                 input.getLeftfirewall(), input.getRightfirewall(), input.getAuto());
 
         ConnAddOutputBuilder builder = new ConnAddOutputBuilder();
-
-        if (input.getConnectionType().equals("active")) {
-            IPsecConnectionBuffer.addActive(input.getName(), connection);
-            builder.setReturn("\"result\":\"success\"");
-        } else if (input.getConnectionType().equals("passive")) {
-            IPsecConnectionBuffer.addPassive(input.getName(), connection);
-            builder.setReturn("\"result\":\"success\"");
+        if (input.getName() == null) {
+            builder.setReturn("{" + '"' + "error" + '"' + ": " + '"' + "name cannot be empty" + '"' + "}");
         } else {
-            builder.setReturn("\"result\":{\"error\":\"connection type can only be active or passive\"}");
+            if (input.getConnectionType() == null) {
+                builder.setReturn("{" + '"' + "error" + '"' + ": " + '"' + "connection-type cannot be empty" + '"' + "}");
+            } else if (input.getConnectionType().equals("active")) {
+                IPsecConnectionBuffer.addActive(input.getName(), connection);
+                builder.setReturn("success");
+            } else if (input.getConnectionType().equals("passive")) {
+                IPsecConnectionBuffer.addPassive(input.getName(), connection);
+                builder.setReturn("success");
+            } else {
+                builder.setReturn("{" + '"' + "error" + '"' + ": " + '"' + "connection-type can only be active or passive" + '"' + "}");
+            }
         }
         RpcResult<ConnAddOutput> rpcResult =
                 Rpcs.<ConnAddOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());

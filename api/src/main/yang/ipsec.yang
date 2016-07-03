@@ -107,7 +107,7 @@ module IPsec {
             uses connection;
         }
         output {
-            leaf return {
+            leaf result {
                 type string;
             }
         }
@@ -118,7 +118,7 @@ module IPsec {
             uses rule;
         }
         output {
-            leaf return {
+            leaf result {
                 type string;
             }
         }
@@ -129,7 +129,7 @@ module IPsec {
             uses secret;
         }
         output {
-            leaf return {
+            leaf result {
                 type string;
             }
         }

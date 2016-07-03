@@ -17,11 +17,13 @@ public class IPsecRuleBuffer {
     private static List<IPsecRule> rules = new Vector<>();
 
     public static void add(IPsecRule rule) {
-        System.out.println("rule: " + rule.toString());
+        int pos = rules.size();
+        System.out.println("rule at " + String.valueOf(pos) + ": " + rule.toString());
         rules.add(rule);
     }
 
     public static void add(int pos, IPsecRule rule) {
+        System.out.println("rule at " + String.valueOf(pos) + ": " + rule.toString());
         rules.add(pos, rule);
     }
 
