@@ -37,14 +37,14 @@ public class IPsecImpl implements IPsecService {
             }
             // return result
             RuleAddOutputBuilder builder = new RuleAddOutputBuilder();
-            builder.setReturn("\"result\":\"success\"");
+            builder.setReturn("success");
             RpcResult<RuleAddOutput> rpcResult =
                     Rpcs.<RuleAddOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
             return Futures.immediateFuture(rpcResult);
         } catch (UnknownHostException e) {
             // return error message
             RuleAddOutputBuilder builder = new RuleAddOutputBuilder();
-            builder.setReturn("\"result\":{\"error\":\"unknown host\"}");
+            builder.setReturn("{" + '"' + "error" + '"' + ": " + '"' + "unknown host" + '"' + "}");
             RpcResult<RuleAddOutput> rpcResult =
                     Rpcs.<RuleAddOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
             return Futures.immediateFuture(rpcResult);
