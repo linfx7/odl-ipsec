@@ -85,17 +85,25 @@ public class TCPServer extends Thread {
         public void run() {
             try {
                 // get request bytes
+                System.out.println("Client connected.");
                 InetAddress remote = socket.getInetAddress();
                 InputStream inputStream = socket.getInputStream();
-                byte[] request = ByteTools.readStream(inputStream);
-                // send response bytes
                 OutputStream outputStream = socket.getOutputStream();
-                ByteTools.writeStream(outputStream, new byte[] {request[0], request[1], ACK});
-                outputStream.flush();
-                outputStream.close();
-                inputStream.close();
-                // call the callback interface
-                callback.respond(remote, request);
+                while (!socket.isClosed()) {
+                    try {
+                        byte[] request = ByteTools.readStream(inputStream);
+                        // send response bytes
+                        ByteTools.writeStream(outputStream, new byte[]{request[0], request[1], ACK});
+                        outputStream.flush();
+                        // call the callback interface
+                        callback.respond(remote, request);
+                    } catch (IOException e) {
+                        break;
+                    }
+                }
+                System.out.println("Client disconnected.");
+//                outputStream.close();
+//                inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

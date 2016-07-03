@@ -51,6 +51,7 @@ public class NotificationService {
         try {
             InetAddress source = Inet4Address.getByAddress(ByteTools.subByteArray(message, 0, 4));
             InetAddress destinatiom = Inet4Address.getByAddress(ByteTools.subByteArray(message, 4, 8));
+            System.out.println("Packet report: " + source.toString() + ", " + destinatiom.toString());
             // get rule
             IPsecRule rule = IPsecRuleBuffer.lookup(source, destinatiom);
             // send confituration message

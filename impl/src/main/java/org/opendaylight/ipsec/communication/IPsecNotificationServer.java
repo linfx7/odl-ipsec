@@ -27,7 +27,8 @@ public class IPsecNotificationServer {
         server = new TCPServer(1919, new TCPServerCallback() {
             @Override
             public void respond(InetAddress from, byte[] request) {
-                MessageService.handleMessage(from, request);
+                NotificationProcessThread processThread = new NotificationProcessThread(from, request);
+                processThread.start();
             }
         });
     }
@@ -49,12 +50,6 @@ public class IPsecNotificationServer {
     public static void main(String[] args) {
         IPsecNotificationServer server = new IPsecNotificationServer();
         server.start();
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        server.stop();
+//        server.stop();
     }
-
 }
