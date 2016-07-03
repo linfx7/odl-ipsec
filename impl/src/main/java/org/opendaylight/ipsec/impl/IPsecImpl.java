@@ -44,7 +44,7 @@ public class IPsecImpl implements IPsecService {
         } catch (UnknownHostException e) {
             // return error message
             RuleAddOutputBuilder builder = new RuleAddOutputBuilder();
-            builder.setResult("{" + '"' + "error" + '"' + ": " + '"' + "unknown host" + '"' + "}");
+            builder.setResult("unknown host");
             RpcResult<RuleAddOutput> rpcResult =
                     Rpcs.<RuleAddOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
             return Futures.immediateFuture(rpcResult);
@@ -60,11 +60,11 @@ public class IPsecImpl implements IPsecService {
                 input.getLeftfirewall(), input.getRightfirewall(), input.getAuto());
 
         ConnAddOutputBuilder builder = new ConnAddOutputBuilder();
-        if (input.getName() == null) {
-            builder.setResult("{" + '"' + "error" + '"' + ": " + '"' + "name cannot be empty" + '"' + "}");
+        if (input.getName() == null || input.getName().equals("")) {
+            builder.setResult("name cannot be empty");
         } else {
-            if (input.getConnectionType() == null) {
-                builder.setResult("{" + '"' + "error" + '"' + ": " + '"' + "connection-type cannot be empty" + '"' + "}");
+            if (input.getConnectionType() == null || input.getConnectionType().equals("")) {
+                builder.setResult("connection-type cannot be empty");
             } else if (input.getConnectionType().equals("active")) {
                 IPsecConnectionBuffer.addActive(input.getName(), connection);
                 builder.setResult("success");
@@ -72,7 +72,7 @@ public class IPsecImpl implements IPsecService {
                 IPsecConnectionBuffer.addPassive(input.getName(), connection);
                 builder.setResult("success");
             } else {
-                builder.setResult("{" + '"' + "error" + '"' + ": " + '"' + "connection-type can only be active or passive" + '"' + "}");
+                builder.setResult("connection-type can only be active or passive");
             }
         }
         RpcResult<ConnAddOutput> rpcResult =
