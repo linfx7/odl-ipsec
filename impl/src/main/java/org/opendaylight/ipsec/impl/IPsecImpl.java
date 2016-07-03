@@ -37,14 +37,14 @@ public class IPsecImpl implements IPsecService {
             }
             // return result
             RuleAddOutputBuilder builder = new RuleAddOutputBuilder();
-            builder.setReturn("success");
+            builder.setResult("success");
             RpcResult<RuleAddOutput> rpcResult =
                     Rpcs.<RuleAddOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
             return Futures.immediateFuture(rpcResult);
         } catch (UnknownHostException e) {
             // return error message
             RuleAddOutputBuilder builder = new RuleAddOutputBuilder();
-            builder.setReturn("{" + '"' + "error" + '"' + ": " + '"' + "unknown host" + '"' + "}");
+            builder.setResult("{" + '"' + "error" + '"' + ": " + '"' + "unknown host" + '"' + "}");
             RpcResult<RuleAddOutput> rpcResult =
                     Rpcs.<RuleAddOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
             return Futures.immediateFuture(rpcResult);
@@ -61,18 +61,18 @@ public class IPsecImpl implements IPsecService {
 
         ConnAddOutputBuilder builder = new ConnAddOutputBuilder();
         if (input.getName() == null) {
-            builder.setReturn("{" + '"' + "error" + '"' + ": " + '"' + "name cannot be empty" + '"' + "}");
+            builder.setResult("{" + '"' + "error" + '"' + ": " + '"' + "name cannot be empty" + '"' + "}");
         } else {
             if (input.getConnectionType() == null) {
-                builder.setReturn("{" + '"' + "error" + '"' + ": " + '"' + "connection-type cannot be empty" + '"' + "}");
+                builder.setResult("{" + '"' + "error" + '"' + ": " + '"' + "connection-type cannot be empty" + '"' + "}");
             } else if (input.getConnectionType().equals("active")) {
                 IPsecConnectionBuffer.addActive(input.getName(), connection);
-                builder.setReturn("success");
+                builder.setResult("success");
             } else if (input.getConnectionType().equals("passive")) {
                 IPsecConnectionBuffer.addPassive(input.getName(), connection);
-                builder.setReturn("success");
+                builder.setResult("success");
             } else {
-                builder.setReturn("{" + '"' + "error" + '"' + ": " + '"' + "connection-type can only be active or passive" + '"' + "}");
+                builder.setResult("{" + '"' + "error" + '"' + ": " + '"' + "connection-type can only be active or passive" + '"' + "}");
             }
         }
         RpcResult<ConnAddOutput> rpcResult =
