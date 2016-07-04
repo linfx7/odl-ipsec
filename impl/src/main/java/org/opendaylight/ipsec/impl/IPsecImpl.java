@@ -27,7 +27,7 @@ public class IPsecImpl implements IPsecService {
     public Future<RpcResult<RuleAddOutput>> ruleAdd(RuleAddInput input) {
         try {
             InetAddress srcAddress = InetAddress.getByName(input.getSrcAddress());
-            InetAddress dstAddress = InetAddress.getByName(input.getSrcAddress());
+            InetAddress dstAddress = InetAddress.getByName(input.getDstAddress());
             IPsecRule rule = new IPsecRule(srcAddress, input.getSrcMask(), dstAddress, input.getDstMask(),
                     input.getAction(), input.getConnectionName());
             if (input.getPos() != null) {
