@@ -36,6 +36,8 @@ public class ConfigurationService {
             // IPsec connection payload
             String connName = rule.getConnectionName();
             IPsecConnection connection = IPsecConnectionBuffer.getActiveByName(connName);
+            connection.setLeftsubnet(rule.getSource().toString().substring(1) + "/" + String.valueOf(rule.getSrcPrefixLen()));
+            connection.setRightsubnet(rule.getDestination().toString().substring(1) + "/" + String.valueOf(rule.getDstPrefixLen()));
             message = ByteTools.addByteArrays(message, genConnectionBytes(connName, connection));
             // TODO add secret payload
 

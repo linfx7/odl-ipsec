@@ -37,7 +37,7 @@ public class Test {
 
         try {
             IPsecRule rule = IPsecRuleBuffer.lookup(Inet4Address.getByName("10.0.1.1"), Inet4Address.getByName("10.0.2.1"));
-            ConfigurationService.issueConfiguration(Inet4Address.getByName("127.0.0.1"), rule);
+            ConfigurationService.issueConfiguration(Inet4Address.getByName("192.168.115.10"), rule);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
