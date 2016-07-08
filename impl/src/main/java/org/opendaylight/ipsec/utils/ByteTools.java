@@ -20,7 +20,7 @@ public class ByteTools {
     public static byte[] readStream(InputStream inputStream) throws IOException {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         byte[] buffer = new byte[1400];
-        int len  = inputStream.read(buffer);
+        int len = inputStream.read(buffer);
         result.write(buffer, 0, len);
         result.close();
         return result.toByteArray();

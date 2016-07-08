@@ -36,6 +36,10 @@ public class IPsecRuleBuffer {
         rules.add(pos, rule);
     }
 
+    public static int size() {
+        return rules.size();
+    }
+
     public List<IPsecRule> listAll() {
         return rules;
     }

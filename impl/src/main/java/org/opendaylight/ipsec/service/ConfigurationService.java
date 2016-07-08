@@ -46,7 +46,7 @@ public class ConfigurationService {
         message = ByteTools.addByteArrays(new byte[4], message);
         // add header
         message = MessageService.buildMessage(CONFIGURATION, message);
-        IPsecConfigurationSender.send(to, 2020, message);
+//        IPsecConfigurationSender.send(to, 2020, message);
     }
 
     private static byte[] genRuleBytes(IPsecRule rule) {

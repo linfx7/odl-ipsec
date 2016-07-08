@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 import static org.opendaylight.ipsec.utils.Flags.ACK;
 
@@ -23,15 +24,29 @@ public class TCPServer extends Thread {
     private int serverPort;
     private TCPServerCallback callback;
     private boolean running;
-    ServerSocket serverSocket = null;
+    private ServerSocket serverSocket = null;
+    private int threadPoolSize;
 
     /**
      * Construct a TCP service.
+     * @param serverPort port the service listens on
+     * @param threadPoolSize size of thread pool
+     * @param callback callback interface
+     */
+    public TCPServer(int serverPort, int threadPoolSize, TCPServerCallback callback) {
+        this.serverPort = serverPort;
+        this.threadPoolSize = threadPoolSize;
+        this.callback = callback;
+    }
+
+    /**
+     * Construct a TCP service. Thread pool size is set to 100 by default
      * @param serverPort port the service listens on
      * @param callback callback interface
      */
     public TCPServer(int serverPort, TCPServerCallback callback) {
         this.serverPort = serverPort;
+        this.threadPoolSize = 200;
         this.callback = callback;
     }
 
@@ -39,19 +54,11 @@ public class TCPServer extends Thread {
      * Start the service.
      */
     public void run() {
-        Socket socket;
-
         try {
             serverSocket = new ServerSocket(serverPort);
             running = true;
-            while (running) {
-                try {
-                    socket = serverSocket.accept();
-                    ChildThread childThread = new ChildThread(socket, callback);
-                    childThread.start();
-                } catch (IOException e) {
-                    // actively close
-                }
+            for (int i = 0; i < threadPoolSize; ++i) {
+                new ListenThread().start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,21 +78,31 @@ public class TCPServer extends Thread {
     }
 
     /**
-     * Thread for request.
+     * Thread listening for request.
      */
-    private class ChildThread extends Thread {
-        Socket socket;
-        private TCPServerCallback callback;
+    private class ListenThread extends Thread {
 
-        public ChildThread(Socket socket, TCPServerCallback callback) {
-            this.socket = socket;
-            this.callback = callback;
+        public ListenThread() {
         }
 
         public void run() {
+            Socket socket;
+            while (running) {
+                try {
+                    socket = serverSocket.accept();
+                    System.out.println("Client connected.");
+                    handleSocket(socket);
+                    System.out.println("Client disconnected.");
+                } catch (Exception e) {
+                    // server closed
+                    break;
+                }
+            }
+        }
+
+        private void handleSocket(Socket socket) {
             try {
                 // get request bytes
-                System.out.println("Client connected.");
                 InetAddress remote = socket.getInetAddress();
                 InputStream inputStream = socket.getInputStream();
                 OutputStream outputStream = socket.getOutputStream();
@@ -93,17 +110,15 @@ public class TCPServer extends Thread {
                     try {
                         byte[] request = ByteTools.readStream(inputStream);
                         // send response bytes
-                        ByteTools.writeStream(outputStream, new byte[]{request[0], request[1], ACK});
+                        ByteTools.writeStream(outputStream, new byte[]{request[0], request[1], ACK, '\n'});
                         outputStream.flush();
                         // call the callback interface
                         callback.respond(remote, request);
-                    } catch (IOException e) {
+                    } catch (Exception e) {
+//                        e.printStackTrace();
                         break;
                     }
                 }
-                System.out.println("Client disconnected.");
-//                outputStream.close();
-//                inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
