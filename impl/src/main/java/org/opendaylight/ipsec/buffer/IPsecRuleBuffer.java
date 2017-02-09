@@ -7,7 +7,9 @@
  */
 package org.opendaylight.ipsec.buffer;
 
+import org.opendaylight.ipsec.domain.IPsecConnection;
 import org.opendaylight.ipsec.domain.IPsecRule;
+import org.opendaylight.ipsec.utils.RuleConflictException;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -16,13 +18,54 @@ import java.util.Vector;
 public class IPsecRuleBuffer {
     private static List<IPsecRule> rules = new Vector<>();
 
-    public static void add(IPsecRule rule) {
+    /**
+     * test whether an added rule will cause conflict
+     * @param rule rule to be added
+     * @return result
+     */
+    private static boolean isConflict(IPsecRule rule) {
+        // -1: discard, -2: forward without process, 0: protect with IPsec
+        if (rule.getAction() != 0) {
+            // detect with all rules (F, F1, F2, ..., Fn)
+            for (IPsecRule ir : rules) {
+                if (rule.overlap(ir)) {
+                    return true;
+                }
+            }
+        } else {
+            // only detect with F and Fi, Fj
+            for (IPsecRule ir : rules) {
+                if (ir.getAction() == 0) {
+                    IPsecConnection conn1 = IPsecConnectionBuffer.getActiveByName(ir.getConnectionName());
+                    IPsecConnection conn2 = IPsecConnectionBuffer.getActiveByName(rule.getConnectionName());
+                    if (!conn1.getLeft().equals(conn2.getLeft())
+                            && !conn1.getRight().equals(conn2.getRight())) {
+                        // two cononections are irrelevent
+                        continue;
+                    }
+                }
+                // for un-ipseced rules and relevent ipseced rules
+                if (rule.overlap(ir)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static void add(IPsecRule rule) throws RuleConflictException {
+        if (isConflict(rule)) {
+            throw new RuleConflictException("conflict");
+        }
         int pos = rules.size();
         System.out.println("rule at " + String.valueOf(pos) + ": " + rule.toString());
         rules.add(rule);
     }
 
-    public static void add(int pos, IPsecRule rule) {
+    public static void add(int pos, IPsecRule rule) throws RuleConflictException {
+        if (isConflict(rule)) {
+            throw new RuleConflictException("conflict");
+        }
         System.out.println("rule at " + String.valueOf(pos) + ": " + rule.toString());
         rules.add(pos, rule);
     }
@@ -40,7 +83,7 @@ public class IPsecRuleBuffer {
         return rules.size();
     }
 
-    public List<IPsecRule> listAll() {
+    public static List<IPsecRule> listAll() {
         return rules;
     }
 

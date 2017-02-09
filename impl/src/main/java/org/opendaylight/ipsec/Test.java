@@ -7,6 +7,9 @@
  */
 package org.opendaylight.ipsec;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.opendaylight.ipsec.buffer.IPsecConnectionBuffer;
 import org.opendaylight.ipsec.buffer.IPsecRuleBuffer;
 import org.opendaylight.ipsec.communication.IPsecNotificationServer;
@@ -17,6 +20,8 @@ import org.opendaylight.ipsec.service.ConfigurationService;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Test {
@@ -105,5 +110,43 @@ public class Test {
             }
         }
         System.out.print(IPsecRuleBuffer.size());
+    }
+
+
+    public static void maiin(String[] args) {
+
+        try {
+            Test t = new Test(InetAddress.getByName("10.1.0.0"), (byte)24);
+
+            JSONObject jo = new JSONObject(t);
+            System.out.println(jo.toString());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    InetAddress add;
+    byte score;
+
+    public Test(InetAddress add, byte score) {
+        this.add = add;
+        this.score = score;
+    }
+
+    public InetAddress getAdd() {
+        return add;
+    }
+
+    public void setAdd(InetAddress add) {
+        this.add = add;
+    }
+
+    public byte getScore() {
+        return score;
+    }
+
+    public void setScore(byte score) {
+        this.score = score;
     }
 }

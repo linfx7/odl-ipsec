@@ -8,8 +8,10 @@
 package org.opendaylight.ipsec.service;
 
 import org.opendaylight.ipsec.buffer.IPsecConnectionBuffer;
+import org.opendaylight.ipsec.buffer.IPsecGatewayBuffer;
 import org.opendaylight.ipsec.communication.IPsecConfigurationSender;
 import org.opendaylight.ipsec.domain.IPsecConnection;
+import org.opendaylight.ipsec.domain.IPsecGateway;
 import org.opendaylight.ipsec.domain.IPsecRule;
 import org.opendaylight.ipsec.utils.ByteTools;
 
@@ -21,14 +23,10 @@ public class ConfigurationService {
 
     /**
      * issue configuration rule
+     * @param to gateway ip
      * @param rule rule to issue
      */
     public static void issueConfiguration(InetAddress to, IPsecRule rule) {
-        // for no suitable rule case
-        if (rule == null) {
-            // TODO report a event
-            return;
-        }
 
         // IPsec rule payload
         byte[] message = genRuleBytes(rule);
@@ -36,17 +34,16 @@ public class ConfigurationService {
             // IPsec connection payload
             String connName = rule.getConnectionName();
             IPsecConnection connection = IPsecConnectionBuffer.getActiveByName(connName);
-            connection.setLeftsubnet(rule.getSource().toString().substring(1) + "/" + String.valueOf(rule.getSrcPrefixLen()));
-            connection.setRightsubnet(rule.getDestination().toString().substring(1) + "/" + String.valueOf(rule.getDstPrefixLen()));
+            connection.setLeftsubnet(rule.getSource() + "/" + String.valueOf(rule.getSrcPrefixLen()));
+            connection.setRightsubnet(rule.getDestination() + "/" + String.valueOf(rule.getDstPrefixLen()));
             message = ByteTools.addByteArrays(message, genConnectionBytes(connName, connection));
-            // TODO add secret payload
-
         }
-        // TODO add ID
+        // TODO add controller ID
+
         message = ByteTools.addByteArrays(new byte[4], message);
         // add header
         message = MessageService.buildMessage(CONFIGURATION, message);
-//        IPsecConfigurationSender.send(to, 2020, message);
+        IPsecConfigurationSender.send(to, 2020, message);
     }
 
     private static byte[] genRuleBytes(IPsecRule rule) {
@@ -66,9 +63,11 @@ public class ConfigurationService {
 
     public static void handleResponse(InetAddress from, byte[] payload) {
         if (payload[0] == SUCCESS) {
-            // TODO set ipsec gate buffer
+            // TODO configuration applied successfully
+
         } else if (payload[0] == ERROR) {
-            // TODO handle error
+            // TODO apply error
+
         }
     }
 }

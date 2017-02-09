@@ -8,18 +8,25 @@
 package org.opendaylight.ipsec.impl;
 
 import com.google.common.util.concurrent.Futures;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.opendaylight.controller.sal.common.util.Rpcs;
 import org.opendaylight.ipsec.buffer.IPsecConnectionBuffer;
 import org.opendaylight.ipsec.buffer.IPsecRuleBuffer;
 import org.opendaylight.ipsec.domain.IPsecConnection;
 import org.opendaylight.ipsec.domain.IPsecRule;
+import org.opendaylight.ipsec.utils.RuleConflictException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ipsec.rev150105.*;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 public class IPsecImpl implements IPsecService {
@@ -31,6 +38,11 @@ public class IPsecImpl implements IPsecService {
             IPsecRule rule = new IPsecRule(srcAddress, input.getSrcMask(), dstAddress, input.getDstMask(),
                     input.getAction(), input.getConnectionName());
             if (input.getPos() != null) {
+                // if update is set to yes
+                // delete the item and add a new one to achieve update
+                if (input.getUpdate() != null && input.getUpdate().equals("yes")) {
+                    IPsecRuleBuffer.remove(input.getPos());
+                }
                 IPsecRuleBuffer.add(input.getPos(), rule);
             } else {
                 IPsecRuleBuffer.add(rule);
@@ -45,6 +57,13 @@ public class IPsecImpl implements IPsecService {
             // return error message
             RuleAddOutputBuilder builder = new RuleAddOutputBuilder();
             builder.setResult("unknown host");
+            RpcResult<RuleAddOutput> rpcResult =
+                    Rpcs.<RuleAddOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
+            return Futures.immediateFuture(rpcResult);
+        } catch (RuleConflictException e) {
+            // return error message
+            RuleAddOutputBuilder builder = new RuleAddOutputBuilder();
+            builder.setResult("rule conflict");
             RpcResult<RuleAddOutput> rpcResult =
                     Rpcs.<RuleAddOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
             return Futures.immediateFuture(rpcResult);
@@ -81,7 +100,50 @@ public class IPsecImpl implements IPsecService {
     }
 
     @Override
-    public Future<RpcResult<SecAddOutput>> secAdd(SecAddInput input) {
+    public Future<RpcResult<RuleAllOutput>> ruleAll(RuleAllInput input) {
+        List<IPsecRule> rules = IPsecRuleBuffer.listAll();
+        JSONArray jsonRules = new JSONArray();
+        for (IPsecRule ir : rules) {
+            jsonRules.put(new JSONObject(ir));
+        }
+
+        RuleAllOutputBuilder builder = new RuleAllOutputBuilder();
+        builder.setResult(jsonRules.toString());
+        RpcResult<RuleAllOutput> rpcResult =
+                Rpcs.<RuleAllOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
+        return Futures.immediateFuture(rpcResult);
+    }
+
+    @Override
+    public Future<RpcResult<ConnAllOutput>> connAll(ConnAllInput input) {
+        Map<String, IPsecConnection> passiveConn = IPsecConnectionBuffer.allPassive();
+        Map<String, IPsecConnection> activeConn = IPsecConnectionBuffer.allActive();
+        JSONArray jsonPassive = new JSONArray();
+        JSONArray jsonActive = new JSONArray();
+        JSONObject result = new JSONObject();
+        try {
+            for (Map.Entry<String, IPsecConnection> entry : passiveConn.entrySet()) {
+                jsonPassive.put(new JSONObject(entry.getValue()).put("name", entry.getKey()));
+            }
+            for (Map.Entry<String, IPsecConnection> entry : activeConn.entrySet()) {
+                jsonActive.put(new JSONObject(entry.getValue()).put("name", entry.getKey()));
+            }
+            result.put("passive", jsonPassive);
+            result.put("active", jsonActive);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        ConnAllOutputBuilder builder = new ConnAllOutputBuilder();
+        builder.setResult(result.toString());
+        RpcResult<ConnAllOutput> rpcResult =
+                Rpcs.<ConnAllOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
+        return Futures.immediateFuture(rpcResult);
+    }
+
+    @Override
+    public Future<RpcResult<GatewayAllOutput>> gatewayAll(GatewayAllInput input) {
         return null;
     }
+
 }

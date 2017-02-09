@@ -8,19 +8,19 @@ module IPsec {
     }
 
     grouping src-netaddress {
-        leaf src-address {
+        leaf source {
             type string;
         }
-        leaf src-mask {
+        leaf src-prefix-len {
             type int8;
         }
     }
 
     grouping dst-netaddress {
-        leaf dst-address {
+        leaf destination {
             type string;
         }
-        leaf dst-mask {
+        leaf dst-prefix-len {
             type int8;
         }
     }
@@ -83,21 +83,12 @@ module IPsec {
     }
 
     grouping rule {
-        leaf pos {
-            type int32;
-        }
         uses src-netaddress;
         uses dst-netaddress;
         leaf action {
             type int32;
         }
         leaf connection-name {
-            type string;
-        }
-    }
-
-    grouping secret {
-        leaf secret {
             type string;
         }
     }
@@ -113,9 +104,9 @@ module IPsec {
         }
     }
 
-    rpc rule-add {
+    rpc conn-all {
         input {
-            uses rule;
+
         }
         output {
             leaf result {
@@ -124,9 +115,15 @@ module IPsec {
         }
     }
 
-    rpc sec-add {
+    rpc rule-add {
         input {
-            uses secret;
+            uses rule;
+            leaf pos {
+                type int32;
+            }
+            leaf update {
+                type string;
+            }
         }
         output {
             leaf result {
@@ -134,4 +131,27 @@ module IPsec {
             }
         }
     }
+
+    rpc rule-all {
+        input {
+
+        }
+        output {
+            leaf result {
+                type string;
+            }
+        }
+    }
+
+    rpc gateway-all {
+        input {
+
+        }
+        output {
+            leaf result {
+                type string;
+            }
+        }
+    }
+
 }

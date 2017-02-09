@@ -11,24 +11,41 @@ import org.opendaylight.ipsec.domain.IPsecGateway;
 import org.opendaylight.ipsec.domain.IPsecRule;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 public class IPsecGatewayBuffer {
-    private static Map<String, IPsecGateway> gateways = new Hashtable<>();
+    private static List<IPsecGateway> gateways = new Vector<>();
 
-    public static void add() {
-
+    public static void add(IPsecGateway gateway) {
+        gateways.add(gateway);
     }
 
-    public static void remove() {
-
+    public static void remove(String id) {
+        for (IPsecGateway gateway : gateways) {
+            if (gateway.getId().equals(id)) {
+                gateways.remove(gateway);
+                break;
+            }
+        }
     }
 
-    public static void update() {
-
+    public static IPsecGateway getGateway(String id) {
+        for (IPsecGateway gateway : gateways) {
+            if (gateway.getId().equals(id)) {
+                return gateway;
+            }
+        }
+        return null;
     }
 
-    public static IPsecRule lookup() {
+    public static IPsecGateway getGatewayByPrivateIP(String ip) {
+        for (IPsecGateway gateway : gateways) {
+            if (gateway.getPrivateip().equals(ip)) {
+                return gateway;
+            }
+        }
         return null;
     }
 }

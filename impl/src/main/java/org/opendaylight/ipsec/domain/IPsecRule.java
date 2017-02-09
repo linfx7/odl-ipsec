@@ -9,6 +9,7 @@ package org.opendaylight.ipsec.domain;
 
 import java.net.InetAddress;
 
+import static org.apache.commons.lang3.math.NumberUtils.min;
 import static org.opendaylight.ipsec.utils.Flags.*;
 
 public class IPsecRule {
@@ -39,7 +40,11 @@ public class IPsecRule {
         this.connectionName = connectionName;
     }
 
-    public InetAddress getSource() {
+    public String getSource() {
+        return source.toString().substring(1);
+    }
+
+    public InetAddress source() {
         return source;
     }
 
@@ -55,7 +60,11 @@ public class IPsecRule {
         this.srcPrefixLen = srcPrefixLen;
     }
 
-    public InetAddress getDestination() {
+    public String getDestination() {
+        return destination.toString().substring(1);
+    }
+
+    public InetAddress destination() {
         return destination;
     }
 
@@ -88,7 +97,7 @@ public class IPsecRule {
     }
 
     /**
-     * If the from to pair match the rule.
+     * If the (from, to) pair match the rule.
      * @param from source address
      * @param to destination address
      * @return match result
@@ -96,6 +105,16 @@ public class IPsecRule {
     public boolean match(InetAddress from, InetAddress to) {
         return matchBits(from.getAddress(), source.getAddress(), srcPrefixLen)
                 && matchBits(to.getAddress(), destination.getAddress(), dstPrefixLen);
+    }
+
+    /**
+     * If the given rule overlay with the current rule.
+     * @param rule the given rule
+     * @return true for overlay
+     */
+    public boolean overlap(IPsecRule rule) {
+        return matchBits(rule.source().getAddress(), source.getAddress(), min(rule.getSrcPrefixLen(), srcPrefixLen))
+                && matchBits(rule.destination().getAddress(), destination.getAddress(), min(rule.getDstPrefixLen(), dstPrefixLen));
     }
 
     /**

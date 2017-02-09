@@ -5,7 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.ipsec.domain;
+package org.opendaylight.ipsec.utils;
 
-public class IPsecSecret {
+public class RuleConflictException extends Exception {
+    public RuleConflictException(String msg) {
+        super(msg);
+    }
 }
