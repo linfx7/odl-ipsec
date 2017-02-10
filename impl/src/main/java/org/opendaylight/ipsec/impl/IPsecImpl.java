@@ -102,63 +102,81 @@ public class IPsecImpl implements IPsecService {
 
     @Override
     public Future<RpcResult<RuleAllOutput>> ruleAll(RuleAllInput input) {
-        List<IPsecRule> rules = IPsecRuleBuffer.listAll();
-        JSONArray jsonRules = new JSONArray();
-        for (IPsecRule ir : rules) {
-            jsonRules.put(new JSONObject(ir));
-        }
+        int action = input.getAction();
 
-        RuleAllOutputBuilder builder = new RuleAllOutputBuilder();
-        builder.setResult(jsonRules.toString());
-        RpcResult<RuleAllOutput> rpcResult =
-                Rpcs.<RuleAllOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
-        return Futures.immediateFuture(rpcResult);
+        if (action == -1) {
+            List<IPsecRule> rules = IPsecRuleBuffer.listAll();
+            JSONArray jsonRules = new JSONArray();
+            for (IPsecRule ir : rules) {
+                jsonRules.put(new JSONObject(ir));
+            }
+
+            RuleAllOutputBuilder builder = new RuleAllOutputBuilder();
+            builder.setResult(jsonRules.toString());
+            RpcResult<RuleAllOutput> rpcResult =
+                    Rpcs.<RuleAllOutput>getRpcResult(true, builder.build(), Collections.<RpcError>emptySet());
+            return Futures.immediateFuture(rpcResult);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public Future<RpcResult<ConnAllOutput>> connAll(ConnAllInput input) {
-        Map<String, IPsecConnection> passiveConn = IPsecConnectionBuffer.allPassive();
-        Map<String, IPsecConnection> activeConn = IPsecConnectionBuffer.allActive();
-        JSONArray jsonPassive = new JSONArray();
-        JSONArray jsonActive = new JSONArray();
-        JSONObject result = new JSONObject();
-        try {
-            for (Map.Entry<String, IPsecConnection> entry : passiveConn.entrySet()) {
-                jsonPassive.put(new JSONObject(entry.getValue()).put("name", entry.getKey()));
-            }
-            for (Map.Entry<String, IPsecConnection> entry : activeConn.entrySet()) {
-                jsonActive.put(new JSONObject(entry.getValue()).put("name", entry.getKey()));
-            }
-            result.put("passive", jsonPassive);
-            result.put("active", jsonActive);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        int action = input.getAction();
 
-        ConnAllOutputBuilder builder = new ConnAllOutputBuilder();
-        builder.setResult(result.toString());
-        RpcResult<ConnAllOutput> rpcResult =
-                Rpcs.<ConnAllOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
-        return Futures.immediateFuture(rpcResult);
+        if (action == -1) {
+            Map<String, IPsecConnection> passiveConn = IPsecConnectionBuffer.allPassive();
+            Map<String, IPsecConnection> activeConn = IPsecConnectionBuffer.allActive();
+            JSONArray jsonPassive = new JSONArray();
+            JSONArray jsonActive = new JSONArray();
+            JSONObject result = new JSONObject();
+            try {
+                for (Map.Entry<String, IPsecConnection> entry : passiveConn.entrySet()) {
+                    jsonPassive.put(new JSONObject(entry.getValue()).put("name", entry.getKey()));
+                }
+                for (Map.Entry<String, IPsecConnection> entry : activeConn.entrySet()) {
+                    jsonActive.put(new JSONObject(entry.getValue()).put("name", entry.getKey()));
+                }
+                result.put("passive", jsonPassive);
+                result.put("active", jsonActive);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            ConnAllOutputBuilder builder = new ConnAllOutputBuilder();
+            builder.setResult(result.toString());
+            RpcResult<ConnAllOutput> rpcResult =
+                    Rpcs.<ConnAllOutput>getRpcResult(true, builder.build(), Collections.<RpcError>emptySet());
+            return Futures.immediateFuture(rpcResult);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public Future<RpcResult<GatewayAllOutput>> gatewayAll(GatewayAllInput input) {
-        List<IPsecGateway> gateways = IPsecGatewayBuffer.getGateways();
-        JSONArray jsonGateways = new JSONArray();
-        for (IPsecGateway ig : gateways) {
-            try {
-                jsonGateways.put(new JSONObject(ig).put("unHundledPackets", new JSONArray(ig.getUnHundledPackets())));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+        int action = input.getAction();
 
-        GatewayAllOutputBuilder builder = new GatewayAllOutputBuilder();
-        builder.setResult(jsonGateways.toString());
-        RpcResult<GatewayAllOutput> rpcResult =
-                Rpcs.<GatewayAllOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
-        return Futures.immediateFuture(rpcResult);
+        if (action == -1) {
+            List<IPsecGateway> gateways = IPsecGatewayBuffer.getGateways();
+            JSONArray jsonGateways = new JSONArray();
+            for (IPsecGateway ig : gateways) {
+                try {
+                    jsonGateways.put(new JSONObject(ig).put("unHundledPackets", new JSONArray(ig.getUnHundledPackets())));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            GatewayAllOutputBuilder builder = new GatewayAllOutputBuilder();
+            builder.setResult(jsonGateways.toString());
+            RpcResult<GatewayAllOutput> rpcResult =
+                    Rpcs.<GatewayAllOutput>getRpcResult(true, builder.build(), Collections.<RpcError>emptySet());
+            return Futures.immediateFuture(rpcResult);
+        } else {
+            return null;
+        }
     }
 
 }
