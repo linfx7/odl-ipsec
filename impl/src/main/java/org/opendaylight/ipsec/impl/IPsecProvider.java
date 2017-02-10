@@ -10,6 +10,7 @@ package org.opendaylight.ipsec.impl;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker.ProviderContext;
 import org.opendaylight.controller.sal.binding.api.BindingAwareProvider;
+import org.opendaylight.ipsec.Test;
 import org.opendaylight.ipsec.communication.IPsecNotificationServer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ipsec.rev150105.IPsecService;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ public class IPsecProvider implements BindingAwareProvider, AutoCloseable {
         LOG.info("IPsecProvider Session Initiated");
         notificationServer = new IPsecNotificationServer();
         notificationServer.start();
+        Test.addTestData();
         LOG.info("IPsec Notification Server Initiated");
     }
 

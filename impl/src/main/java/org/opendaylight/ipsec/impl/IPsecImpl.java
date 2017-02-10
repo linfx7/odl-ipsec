@@ -13,8 +13,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.opendaylight.controller.sal.common.util.Rpcs;
 import org.opendaylight.ipsec.buffer.IPsecConnectionBuffer;
+import org.opendaylight.ipsec.buffer.IPsecGatewayBuffer;
 import org.opendaylight.ipsec.buffer.IPsecRuleBuffer;
 import org.opendaylight.ipsec.domain.IPsecConnection;
+import org.opendaylight.ipsec.domain.IPsecGateway;
 import org.opendaylight.ipsec.domain.IPsecRule;
 import org.opendaylight.ipsec.utils.RuleConflictException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ipsec.rev150105.*;
@@ -33,9 +35,9 @@ public class IPsecImpl implements IPsecService {
     @Override
     public Future<RpcResult<RuleAddOutput>> ruleAdd(RuleAddInput input) {
         try {
-            InetAddress srcAddress = InetAddress.getByName(input.getSrcAddress());
-            InetAddress dstAddress = InetAddress.getByName(input.getDstAddress());
-            IPsecRule rule = new IPsecRule(srcAddress, input.getSrcMask(), dstAddress, input.getDstMask(),
+            InetAddress srcAddress = InetAddress.getByName(input.getSource());
+            InetAddress dstAddress = InetAddress.getByName(input.getDestination());
+            IPsecRule rule = new IPsecRule(srcAddress, input.getSrcPrefixLen(), dstAddress, input.getDstPrefixLen(),
                     input.getAction(), input.getConnectionName());
             if (input.getPos() != null) {
                 // if update is set to yes
@@ -143,7 +145,21 @@ public class IPsecImpl implements IPsecService {
 
     @Override
     public Future<RpcResult<GatewayAllOutput>> gatewayAll(GatewayAllInput input) {
-        return null;
+        List<IPsecGateway> gateways = IPsecGatewayBuffer.getGateways();
+        JSONArray jsonGateways = new JSONArray();
+        for (IPsecGateway ig : gateways) {
+            try {
+                jsonGateways.put(new JSONObject(ig).put("unHundledPackets", new JSONArray(ig.getUnHundledPackets())));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        GatewayAllOutputBuilder builder = new GatewayAllOutputBuilder();
+        builder.setResult(jsonGateways.toString());
+        RpcResult<GatewayAllOutput> rpcResult =
+                Rpcs.<GatewayAllOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
+        return Futures.immediateFuture(rpcResult);
     }
 
 }

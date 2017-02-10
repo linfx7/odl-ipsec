@@ -9,7 +9,9 @@ package org.opendaylight.ipsec.domain;
 
 
 import java.net.InetAddress;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 public class IPsecGateway {
@@ -98,16 +100,36 @@ public class IPsecGateway {
         this.memory = memory;
     }
 
-    public List<IPsecRule> getIssuedRules() {
+    public List<IPsecRule> IssuedRules() {
         return issuedRules;
+    }
+
+    public List<String> getIssuedRules() {
+        List<String> rules = new Vector<>();
+        for (IPsecRule ir : issuedRules) {
+            rules.add(ir.getConnectionName());
+        }
+        return rules;
     }
 
     public void addIssuedRules(IPsecRule rule) {
         issuedRules.add(rule);
     }
 
-    public List<IPsecRule> getUnHundledPackets() {
+    public List<IPsecRule> UnHundledPackets() {
         return unHundledPackets;
+    }
+
+    public List<Map<String, String>> getUnHundledPackets() {
+        List<Map<String, String>> result = new Vector<>();
+        Map<String, String> tmap;
+        for (IPsecRule ir : unHundledPackets) {
+            tmap = new HashMap<>();
+            tmap.put("src", ir.getSource());
+            tmap.put("dst", ir.getDestination());
+            result.add(tmap);
+        }
+        return result;
     }
 
     public void addUnHundledPackets(InetAddress from, InetAddress to) {

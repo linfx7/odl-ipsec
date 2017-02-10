@@ -8,10 +8,13 @@
 package org.opendaylight.ipsec.buffer;
 
 import org.opendaylight.ipsec.domain.IPsecConnection;
+import org.opendaylight.ipsec.domain.IPsecGateway;
 import org.opendaylight.ipsec.domain.IPsecRule;
+import org.opendaylight.ipsec.service.ConfigurationService;
 import org.opendaylight.ipsec.utils.RuleConflictException;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
 
@@ -51,6 +54,28 @@ public class IPsecRuleBuffer {
             }
         }
         return false;
+    }
+
+    /**
+     * check all gateways for unhundled packets
+     */
+    private static void checkAllGateways(IPsecRule rule) {
+        for (IPsecGateway ig : IPsecGatewayBuffer.getGateways()) {
+            // for each gateways
+            for (IPsecRule unHundled : ig.UnHundledPackets()) {
+                // for each unhundled packets
+                if (rule.match(unHundled.source(), unHundled.destination())) {
+                    // if matches, issue the rule
+                    try {
+                        ConfigurationService.issueConfiguration(InetAddress.getByName(ig.getPrivateip()), rule);
+                        // add the rule to gateway buffer
+                        ig.addIssuedRules(rule);
+                    } catch (UnknownHostException e) {
+                        // impossible
+                    }
+                }
+            }
+        }
     }
 
     public static void add(IPsecRule rule) throws RuleConflictException {

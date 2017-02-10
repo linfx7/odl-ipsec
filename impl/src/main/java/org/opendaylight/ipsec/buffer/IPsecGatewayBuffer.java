@@ -48,4 +48,8 @@ public class IPsecGatewayBuffer {
         }
         return null;
     }
+
+    public static List<IPsecGateway> getGateways() {
+        return gateways;
+    }
 }

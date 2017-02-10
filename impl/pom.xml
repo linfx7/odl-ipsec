@@ -32,7 +32,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20090211</version>
+      <version>20131018</version>
     </dependency>
 
     <!-- Testing Dependencies -->

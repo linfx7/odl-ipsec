@@ -11,20 +11,77 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.opendaylight.ipsec.buffer.IPsecConnectionBuffer;
+import org.opendaylight.ipsec.buffer.IPsecGatewayBuffer;
 import org.opendaylight.ipsec.buffer.IPsecRuleBuffer;
 import org.opendaylight.ipsec.communication.IPsecNotificationServer;
 import org.opendaylight.ipsec.domain.IPsecConnection;
+import org.opendaylight.ipsec.domain.IPsecGateway;
 import org.opendaylight.ipsec.domain.IPsecRule;
 import org.opendaylight.ipsec.service.ConfigurationService;
+import org.opendaylight.ipsec.utils.RuleConflictException;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Test {
+
+    public static void addTestData() {
+        IPsecConnectionBuffer.addActive("cona", new IPsecConnection("ikev2",
+                "", "", "", "secret", "192.168.0.1",
+                "192.168.0.2", "@moon.strongswan.org", "@sun.strongswan.org",
+                "", "", "", "",
+                "yes", "", "add"));
+        IPsecConnectionBuffer.addPassive("conp", new IPsecConnection("ikev2",
+                "", "", "", "secret", "%any",
+                "%any", "@moon.strongswan.org", "@sun.strongswan.org",
+                "", "", "", "",
+                "yes", "", "add"));
+
+        IPsecRule rule = null;
+        try {
+             rule = new IPsecRule(Inet4Address.getByName("10.1.0.0"), (byte)16,
+                    Inet4Address.getByName("10.2.0.0"), (byte)16, 0, "cona");
+            IPsecRuleBuffer.add(rule);
+            System.out.println(rule.getSource() + " --> " + rule.getDestination());
+        } catch (UnknownHostException e) {
+
+        } catch (RuleConflictException e) {
+
+        }
+
+        try {
+            rule = new IPsecRule(Inet4Address.getByName("10.1.1.0"), (byte)24,
+                    Inet4Address.getByName("10.2.2.0"), (byte)24, 0, "cona");
+            IPsecRuleBuffer.add(rule);
+            System.out.println(rule.getSource() + " --> " + rule.getDestination());
+        } catch (UnknownHostException e) {
+
+        } catch (RuleConflictException e) {
+            System.out.println("Confilict");
+        }
+
+        IPsecGateway gateway = new IPsecGateway();
+        gateway.setId("1");
+        gateway.setPrivateip("10.1.1.1");
+        gateway.setPublicip("192.168.0.1");
+        gateway.setCpu(10);
+        gateway.setMemory(10);
+        gateway.setNetwork(2);
+        IPsecGatewayBuffer.add(gateway);
+
+        gateway.IssuedRules().add(rule); // should be 10.1.0.0 --> 10.2.2.0
+        try {
+            gateway.UnHundledPackets().add(new IPsecRule(InetAddress.getByName("10.1.1.10"), (byte)32,
+                    InetAddress.getByName("10.2.2.20"), (byte)32, 0, ""));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     public static void testInit() {
 
         int ipos = 0;
@@ -48,7 +105,7 @@ public class Test {
         }*/
 
         //add rules
-        addRules();
+        //addRules();
 
         IPsecNotificationServer notificationServer = new IPsecNotificationServer(); //1919
         notificationServer.start();
@@ -74,6 +131,7 @@ public class Test {
         }*/
     }
 
+    /*
     public static void addRules () {
         int pos = 0;
         String srcAddress = "";
@@ -111,16 +169,21 @@ public class Test {
         }
         System.out.print(IPsecRuleBuffer.size());
     }
-
+    */
 
     public static void maiin(String[] args) {
 
         try {
             Test t = new Test(InetAddress.getByName("10.1.0.0"), (byte)24);
+            Map<String, String> mp = new HashMap<String, String>();
+            mp.put("src", "123");
+            t.getResult().add(mp);
 
-            JSONObject jo = new JSONObject(t);
+            JSONObject jo = new JSONObject(t).put("result", new JSONArray(t.getResult()));
             System.out.println(jo.toString());
         } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
@@ -128,10 +191,12 @@ public class Test {
 
     InetAddress add;
     byte score;
+    List<Map<String, String>> result;
 
     public Test(InetAddress add, byte score) {
         this.add = add;
         this.score = score;
+        result = new Vector<>();
     }
 
     public InetAddress getAdd() {
@@ -148,5 +213,13 @@ public class Test {
 
     public void setScore(byte score) {
         this.score = score;
+    }
+
+    public List<Map<String, String>> getResult() {
+        return result;
+    }
+
+    public void setResult(List<Map<String, String>> result) {
+        this.result = result;
     }
 }
