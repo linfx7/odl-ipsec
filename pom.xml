@@ -48,6 +48,19 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
           <skip>true</skip>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${bundle.plugin.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Import-Package>
+              org.json
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
