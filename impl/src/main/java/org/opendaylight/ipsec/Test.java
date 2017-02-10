@@ -8,7 +8,6 @@
 package org.opendaylight.ipsec;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.opendaylight.ipsec.buffer.IPsecConnectionBuffer;
 import org.opendaylight.ipsec.buffer.IPsecGatewayBuffer;
@@ -17,13 +16,15 @@ import org.opendaylight.ipsec.communication.IPsecNotificationServer;
 import org.opendaylight.ipsec.domain.IPsecConnection;
 import org.opendaylight.ipsec.domain.IPsecGateway;
 import org.opendaylight.ipsec.domain.IPsecRule;
-import org.opendaylight.ipsec.service.ConfigurationService;
 import org.opendaylight.ipsec.utils.RuleConflictException;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 public class Test {
 

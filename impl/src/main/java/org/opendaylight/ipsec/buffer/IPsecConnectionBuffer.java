@@ -10,7 +10,6 @@ package org.opendaylight.ipsec.buffer;
 import org.opendaylight.ipsec.domain.IPsecConnection;
 
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 
 public class IPsecConnectionBuffer {

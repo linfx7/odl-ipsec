@@ -8,13 +8,10 @@
 package org.opendaylight.ipsec.communication;
 
 
-import org.opendaylight.ipsec.service.MessageService;
 import org.opendaylight.ipsec.utils.tcp.TCPServer;
 import org.opendaylight.ipsec.utils.tcp.TCPServerCallback;
 
 import java.net.InetAddress;
-
-import static java.lang.Thread.sleep;
 
 public class IPsecNotificationServer {
 

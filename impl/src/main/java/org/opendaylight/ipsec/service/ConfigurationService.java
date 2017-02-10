@@ -8,10 +8,8 @@
 package org.opendaylight.ipsec.service;
 
 import org.opendaylight.ipsec.buffer.IPsecConnectionBuffer;
-import org.opendaylight.ipsec.buffer.IPsecGatewayBuffer;
 import org.opendaylight.ipsec.communication.IPsecConfigurationSender;
 import org.opendaylight.ipsec.domain.IPsecConnection;
-import org.opendaylight.ipsec.domain.IPsecGateway;
 import org.opendaylight.ipsec.domain.IPsecRule;
 import org.opendaylight.ipsec.utils.ByteTools;
 

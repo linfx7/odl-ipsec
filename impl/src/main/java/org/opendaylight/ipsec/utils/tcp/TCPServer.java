@@ -15,7 +15,6 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 
 import static org.opendaylight.ipsec.utils.Flags.ACK;
 

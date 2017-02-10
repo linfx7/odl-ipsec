@@ -8,11 +8,8 @@
 package org.opendaylight.ipsec.buffer;
 
 import org.opendaylight.ipsec.domain.IPsecGateway;
-import org.opendaylight.ipsec.domain.IPsecRule;
 
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 public class IPsecGatewayBuffer {
