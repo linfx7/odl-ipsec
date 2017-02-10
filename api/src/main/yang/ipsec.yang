@@ -106,7 +106,9 @@ module IPsec {
 
     rpc conn-all {
         input {
-
+            leaf action {
+                type int32;
+            }
         }
         output {
             leaf result {
@@ -134,7 +136,9 @@ module IPsec {
 
     rpc rule-all {
         input {
-
+            leaf action {
+                type int32;
+            }
         }
         output {
             leaf result {
@@ -145,7 +149,9 @@ module IPsec {
 
     rpc gateway-all {
         input {
-
+            leaf action {
+                type int32;
+            }
         }
         output {
             leaf result {

@@ -46,9 +46,7 @@ public class Test {
                     Inet4Address.getByName("10.2.0.0"), (byte)16, 0, "cona");
             IPsecRuleBuffer.add(rule);
             System.out.println(rule.getSource() + " --> " + rule.getDestination());
-        } catch (UnknownHostException e) {
-
-        } catch (RuleConflictException e) {
+        } catch (Exception e) {
 
         }
 

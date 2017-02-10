@@ -109,7 +109,6 @@ public class IPsecImpl implements IPsecService {
         }
 
         RuleAllOutputBuilder builder = new RuleAllOutputBuilder();
-        System.out.println(jsonRules.toString());
         builder.setResult(jsonRules.toString());
         RpcResult<RuleAllOutput> rpcResult =
                 Rpcs.<RuleAllOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());

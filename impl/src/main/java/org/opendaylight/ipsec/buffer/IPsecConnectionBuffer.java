@@ -17,12 +17,12 @@ public class IPsecConnectionBuffer {
     private static Map<String, IPsecConnection> activeConnections = new Hashtable<>();
 
     public static void addPassive(String name, IPsecConnection connection) {
-        System.out.println("passive connection: " + connection.toString());
+//        System.out.println("passive connection: " + connection.toString());
         passiveConnections.put(name, connection);
     }
 
     public static void addActive(String name, IPsecConnection connection) {
-        System.out.println("active connection: " + connection.toString());
+//        System.out.println("active connection: " + connection.toString());
         activeConnections.put(name, connection);
     }
 
