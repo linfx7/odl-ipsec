@@ -171,19 +171,22 @@ public class Test {
     }
     */
 
-    public static void maiin(String[] args) {
+    public static void maiIn(String[] args) {
 
         try {
             Test t = new Test(InetAddress.getByName("10.1.0.0"), (byte)24);
             Map<String, String> mp = new HashMap<String, String>();
             mp.put("src", "123");
             t.getResult().add(mp);
+            List<Test> list = new Vector<>();
+            list.add(t);
 
-            JSONObject jo = new JSONObject(t).put("result", new JSONArray(t.getResult()));
+            JSONObject jo = new JSONObject(t);//.put("result", new JSONArray(t.getResult()));
+            JSONArray ja = new JSONArray(list);
+
             System.out.println(jo.toString());
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+            System.out.println(ja.toString());
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
