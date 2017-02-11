@@ -11,7 +11,7 @@ module IPsec {
         leaf source {
             type string;
         }
-        leaf src-prefix-len {
+        leaf srcPrefixLen {
             type int8;
         }
     }
@@ -20,13 +20,13 @@ module IPsec {
         leaf destination {
             type string;
         }
-        leaf dst-prefix-len {
+        leaf dstPrefixLen {
             type int8;
         }
     }
 
     grouping connection {
-        leaf connection-type {
+        leaf connectionType {
             type string;
         }
         leaf name {
@@ -88,7 +88,7 @@ module IPsec {
         leaf action {
             type int32;
         }
-        leaf connection-name {
+        leaf connectionName {
             type string;
         }
     }

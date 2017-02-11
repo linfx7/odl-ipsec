@@ -22,6 +22,8 @@ import org.opendaylight.ipsec.utils.RuleConflictException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ipsec.rev150105.*;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -31,6 +33,8 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 public class IPsecImpl implements IPsecService {
+    private static final Logger LOG = LoggerFactory.getLogger(IPsecProvider.class);
+
     @Override
     public Future<RpcResult<RuleAddOutput>> ruleAdd(RuleAddInput input) {
         try {
@@ -42,10 +46,15 @@ public class IPsecImpl implements IPsecService {
                 // if update is set to yes
                 // delete the item and add a new one to achieve update
                 if (input.getUpdate() != null && input.getUpdate().equals("yes")) {
+                    LOG.info("update rule at " + input.getPos() + ": " + rule.getSource() + " --> " + rule.getDestination());
                     IPsecRuleBuffer.remove(input.getPos());
+                    IPsecRuleBuffer.add(input.getPos(), rule);
+                } else {
+                    LOG.info("insert rule at " + input.getPos() + ": " + rule.getSource() + " --> " + rule.getDestination());
+                    IPsecRuleBuffer.add(input.getPos(), rule);
                 }
-                IPsecRuleBuffer.add(input.getPos(), rule);
             } else {
+                LOG.info("add rule: " + rule.getSource() + " --> " + rule.getDestination());
                 IPsecRuleBuffer.add(rule);
             }
             // return result
@@ -62,6 +71,7 @@ public class IPsecImpl implements IPsecService {
                     Rpcs.<RuleAddOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
             return Futures.immediateFuture(rpcResult);
         } catch (RuleConflictException e) {
+            LOG.info("rule conflict");
             // return error message
             RuleAddOutputBuilder builder = new RuleAddOutputBuilder();
             builder.setResult("rule conflict");
@@ -86,9 +96,11 @@ public class IPsecImpl implements IPsecService {
             if (input.getConnectionType() == null || input.getConnectionType().equals("")) {
                 builder.setResult("connection-type cannot be empty");
             } else if (input.getConnectionType().equals("active")) {
+                LOG.info("active connection: " + input.getName());
                 IPsecConnectionBuffer.addActive(input.getName(), connection);
                 builder.setResult("success");
             } else if (input.getConnectionType().equals("passive")) {
+                LOG.info("passive connection: " + input.getName());
                 IPsecConnectionBuffer.addPassive(input.getName(), connection);
                 builder.setResult("success");
             } else {

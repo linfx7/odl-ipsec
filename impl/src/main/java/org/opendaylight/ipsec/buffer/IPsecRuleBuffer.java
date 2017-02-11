@@ -83,7 +83,7 @@ public class IPsecRuleBuffer {
             throw new RuleConflictException("conflict");
         }
         int pos = rules.size();
-        System.out.println("rule at " + String.valueOf(pos) + ": " + rule.toString());
+//        System.out.println("rule at " + String.valueOf(pos) + ": " + rule.toString());
         rules.add(rule);
     }
 
@@ -91,7 +91,7 @@ public class IPsecRuleBuffer {
         if (isConflict(rule)) {
             throw new RuleConflictException("conflict");
         }
-        System.out.println("rule at " + String.valueOf(pos) + ": " + rule.toString());
+//        System.out.println("rule at " + String.valueOf(pos) + ": " + rule.toString());
         rules.add(pos, rule);
     }
 
