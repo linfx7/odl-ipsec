@@ -43,16 +43,8 @@ public class IPsecImpl implements IPsecService {
             IPsecRule rule = new IPsecRule(srcAddress, input.getSrcPrefixLen(), dstAddress, input.getDstPrefixLen(),
                     input.getAction(), input.getConnectionName());
             if (input.getPos() != null) {
-                // if update is set to yes
-                // delete the item and add a new one to achieve update
-                if (input.getUpdate() != null && input.getUpdate().equals("yes")) {
-                    LOG.info("update rule at " + input.getPos() + ": " + rule.getSource() + " --> " + rule.getDestination());
-                    IPsecRuleBuffer.remove(input.getPos());
-                    IPsecRuleBuffer.add(input.getPos(), rule);
-                } else {
-                    LOG.info("insert rule at " + input.getPos() + ": " + rule.getSource() + " --> " + rule.getDestination());
-                    IPsecRuleBuffer.add(input.getPos(), rule);
-                }
+                LOG.info("insert rule at " + input.getPos() + ": " + rule.getSource() + " --> " + rule.getDestination());
+                IPsecRuleBuffer.add(input.getPos(), rule);
             } else {
                 LOG.info("add rule: " + rule.getSource() + " --> " + rule.getDestination());
                 IPsecRuleBuffer.add(rule);
@@ -94,7 +86,7 @@ public class IPsecImpl implements IPsecService {
             builder.setResult("name cannot be empty");
         } else {
             if (input.getConnectionType() == null || input.getConnectionType().equals("")) {
-                builder.setResult("connection-type cannot be empty");
+                builder.setResult("connectionType cannot be empty");
             } else if (input.getConnectionType().equals("active")) {
                 LOG.info("active connection: " + input.getName());
                 IPsecConnectionBuffer.addActive(input.getName(), connection);

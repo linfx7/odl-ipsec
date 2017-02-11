@@ -70,6 +70,8 @@ public class IPsecRuleBuffer {
                         ConfigurationService.issueConfiguration(InetAddress.getByName(ig.getPrivateip()), rule);
                         // add the rule to gateway buffer
                         ig.addIssuedRules(rule);
+                        // remove the packet
+                        ig.UnHundledPackets().remove(unHundled);
                     } catch (UnknownHostException e) {
                         // impossible
                     }

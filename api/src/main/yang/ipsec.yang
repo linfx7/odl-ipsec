@@ -123,9 +123,6 @@ module IPsec {
             leaf pos {
                 type int32;
             }
-            leaf update {
-                type string;
-            }
         }
         output {
             leaf result {

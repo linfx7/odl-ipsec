@@ -25,7 +25,7 @@ public class IPsecProvider implements BindingAwareProvider, AutoCloseable {
     @Override
     public void onSessionInitiated(ProviderContext session) {
         ipsecService = session.addRpcImplementation(IPsecService.class, new IPsecImpl());
-        LOG.info("IPsecProvider Session Initiated");
+        LOG.info("IPsec Provider Session Initiated");
         notificationServer = new IPsecNotificationServer();
         notificationServer.start();
         Test.addTestData();
