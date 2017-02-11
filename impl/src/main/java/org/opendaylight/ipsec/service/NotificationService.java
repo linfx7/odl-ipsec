@@ -11,7 +11,10 @@ import org.opendaylight.ipsec.buffer.IPsecGatewayBuffer;
 import org.opendaylight.ipsec.buffer.IPsecRuleBuffer;
 import org.opendaylight.ipsec.domain.IPsecGateway;
 import org.opendaylight.ipsec.domain.IPsecRule;
+import org.opendaylight.ipsec.impl.IPsecProvider;
 import org.opendaylight.ipsec.utils.ByteTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -20,13 +23,13 @@ import java.net.UnknownHostException;
 import static org.opendaylight.ipsec.utils.Flags.*;
 
 public class NotificationService {
+    private static final Logger LOG = LoggerFactory.getLogger(IPsecProvider.class);
 
     /**
      * Dispatch notifications.
      * @param payload request payload
      */
     public static void handleNotification(InetAddress from, byte[] payload) {
-
         int idn = ((int) payload[0] << 24) + ((int) payload[1] << 16) + ((int) payload[2] << 8) + ((int) payload[3]);
         String id = Integer.toString(idn);
         IPsecGateway gateway = IPsecGatewayBuffer.getGateway(id);
@@ -36,21 +39,26 @@ public class NotificationService {
             gateway.setId(id);
             gateway.setPrivateip(from.toString().substring(1));
             IPsecGatewayBuffer.add(gateway);
+            LOG.info("New gateway " + gateway.getId() + " from " + gateway.getPrivateip());
         }
 
         if (payload[4] == STATUS) {
             // 1000 0000 : status
-
-            // update current gateway info
-            // get public ip
-            String publicip = "";
-            try {
-                publicip = Inet4Address.getByAddress(ByteTools.subByteArray(payload, 5, 9)).toString().substring(1);
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
+            // update gateway info
+            if (payload.length != 12) {
+                // delete the gateway
+                IPsecGatewayBuffer.remove(gateway);
+                LOG.info("Gateway " + gateway.getId() + " from " + gateway.getPrivateip() + " offline");
+            } else {
+                // get information
+                try {
+                    String publicIP = Inet4Address.getByAddress(ByteTools.subByteArray(payload, 5, 9)).toString().substring(1);
+                    // update gateway info
+                    gateway.update(publicIP, from.toString().substring(1), payload[9], payload[10], payload[11]);
+                } catch (UnknownHostException e) {
+                    // impossible
+                }
             }
-            // update new gateway info
-            gateway.update(publicip, from.toString().substring(1), payload[9], payload[10], payload[11]);
         } else if (payload[4] == EVENT) {
             // 0100 0000 : event
             if (payload[5] == EVENT_PACKET) {
@@ -75,7 +83,8 @@ public class NotificationService {
         try {
             InetAddress source = Inet4Address.getByAddress(ByteTools.subByteArray(message, 0, 4));
             InetAddress destinatiom = Inet4Address.getByAddress(ByteTools.subByteArray(message, 4, 8));
-            System.out.println("Packet report from " + gateway.getId() + " : " + source.toString() + ", " + destinatiom.toString());
+            LOG.info("Packet report from " + gateway.getId() + " : "
+                    + source.toString().substring(1) + ", " + destinatiom.toString().substring(1));
             // get rule
             IPsecRule rule = IPsecRuleBuffer.lookup(source, destinatiom);
 

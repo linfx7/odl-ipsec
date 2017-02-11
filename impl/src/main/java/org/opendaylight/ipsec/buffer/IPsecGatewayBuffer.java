@@ -19,13 +19,8 @@ public class IPsecGatewayBuffer {
         gateways.add(gateway);
     }
 
-    public static void remove(String id) {
-        for (IPsecGateway gateway : gateways) {
-            if (gateway.getId().equals(id)) {
-                gateways.remove(gateway);
-                break;
-            }
-        }
+    public static void remove(IPsecGateway gateway) {
+        gateways.remove(gateway);
     }
 
     public static IPsecGateway getGateway(String id) {
