@@ -45,7 +45,7 @@ public class Test {
              rule = new IPsecRule(Inet4Address.getByName("10.1.0.0"), (byte)16,
                     Inet4Address.getByName("10.2.0.0"), (byte)16, 0, "cona");
             IPsecRuleBuffer.add(rule);
-            System.out.println(rule.getSource() + " --> " + rule.getDestination());
+//            System.out.println(rule.getSource() + " --> " + rule.getDestination());
         } catch (Exception e) {
 
         }
@@ -54,11 +54,11 @@ public class Test {
             rule = new IPsecRule(Inet4Address.getByName("10.1.1.0"), (byte)24,
                     Inet4Address.getByName("10.2.2.0"), (byte)24, 0, "cona");
             IPsecRuleBuffer.add(rule);
-            System.out.println(rule.getSource() + " --> " + rule.getDestination());
+//            System.out.println(rule.getSource() + " --> " + rule.getDestination());
         } catch (UnknownHostException e) {
 
         } catch (RuleConflictException e) {
-            System.out.println("Confilict");
+//            System.out.println("Confilict");
         }
 
         IPsecGateway gateway = new IPsecGateway();
@@ -170,7 +170,7 @@ public class Test {
     }
     */
 
-    public static void maiIn(String[] args) {
+    public static void maain(String[] args) {
 
         try {
             Test t = new Test(InetAddress.getByName("10.1.0.0"), (byte)24);
@@ -185,6 +185,14 @@ public class Test {
 
             System.out.println(jo.toString());
             System.out.println(ja.toString());
+
+            JSONArray array = new JSONArray();
+            array.put(5);
+            array.put(4);
+            array.put(3);
+            array.put(2);
+            array.put(1);
+            System.out.println(array.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
