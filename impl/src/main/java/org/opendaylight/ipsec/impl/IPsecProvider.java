@@ -28,7 +28,7 @@ public class IPsecProvider implements BindingAwareProvider, AutoCloseable {
         LOG.info("IPsec Provider Session Initiated");
         notificationServer = new IPsecNotificationServer();
         notificationServer.start();
-        Test.addTestData();
+//        Test.addTestData();
         LOG.info("IPsec Notification Server Initiated");
     }
 
