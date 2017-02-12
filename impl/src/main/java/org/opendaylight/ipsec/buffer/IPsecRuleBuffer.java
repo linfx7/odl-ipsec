@@ -17,6 +17,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
+import java.util.Iterator;
 
 public class IPsecRuleBuffer {
     private static List<IPsecRule> rules = new Vector<>();
@@ -36,22 +37,24 @@ public class IPsecRuleBuffer {
                 }
             }
         } else {
-            // only detect with F and Fi, Fj
-            for (IPsecRule ir : rules) {
-                if (ir.getAction() == 0) {
-                    IPsecConnection conn1 = IPsecConnectionBuffer.getActiveByName(ir.getConnectionName());
-                    IPsecConnection conn2 = IPsecConnectionBuffer.getActiveByName(rule.getConnectionName());
-                    if (!conn1.getLeft().equals(conn2.getLeft())
-                            && !conn1.getRight().equals(conn2.getRight())) {
-                        // two cononections are irrelevent
-                        continue;
-                    }
-                }
-                // for un-ipseced rules and relevent ipseced rules
-                if (rule.overlap(ir)) {
-                    return true;
-                }
-            }
+            IPsecConnection conn1 = IPsecConnectionBuffer.getActiveByName(rule.getConnectionName());
+            if (conn1 != null) {
+              // only detect with F and Fi, Fj
+              for (IPsecRule ir : rules) {
+                  if (ir.getAction() == 0) {
+                      IPsecConnection conn2 = IPsecConnectionBuffer.getActiveByName(ir.getConnectionName());
+                      if (!conn1.getLeft().equals(conn2.getLeft())
+                              && !conn1.getRight().equals(conn2.getRight())) {
+                          // two cononections are irrelevent
+                          continue;
+                      }
+                  }
+                  // for un-ipseced rules and relevent ipseced rules
+                  if (rule.overlap(ir)) {
+                      return true;
+                  }
+              }
+           }
         }
         return false;
     }
@@ -62,16 +65,20 @@ public class IPsecRuleBuffer {
     private static void checkAllGateways(IPsecRule rule) {
         for (IPsecGateway ig : IPsecGatewayBuffer.getGateways()) {
             // for each gateways
-            for (IPsecRule unHundled : ig.UnHundledPackets()) {
+            IPsecRule tmpRule;
+            Iterator<IPsecRule> unHundled = ig.UnHundledPackets().iterator();
+            while (unHundled.hasNext()) {
                 // for each unhundled packets
-                if (rule.match(unHundled.source(), unHundled.destination())) {
+                tmpRule = unHundled.next();
+                if (rule.match(tmpRule.source(), tmpRule.destination())) {
                     // if matches, issue the rule
                     try {
                         ConfigurationService.issueConfiguration(InetAddress.getByName(ig.getPrivateip()), rule);
                         // add the rule to gateway buffer
                         ig.addIssuedRules(rule);
                         // remove the packet
-                        ig.UnHundledPackets().remove(unHundled);
+//                        ig.UnHundledPackets().remove(unHundled);
+                        unHundled.remove();
                     } catch (UnknownHostException e) {
                         // impossible
                     }
@@ -84,6 +91,7 @@ public class IPsecRuleBuffer {
         if (isConflict(rule)) {
             throw new RuleConflictException("conflict");
         }
+        checkAllGateways(rule);
         int pos = rules.size();
 //        System.out.println("rule at " + String.valueOf(pos) + ": " + rule.toString());
         rules.add(rule);
@@ -93,6 +101,7 @@ public class IPsecRuleBuffer {
         if (isConflict(rule)) {
             throw new RuleConflictException("conflict");
         }
+        checkAllGateways(rule);
 //        System.out.println("rule at " + String.valueOf(pos) + ": " + rule.toString());
         rules.add(pos, rule);
     }

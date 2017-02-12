@@ -33,14 +33,6 @@ public class NotificationService {
         int idn = ((int) payload[0] << 24) + ((int) payload[1] << 16) + ((int) payload[2] << 8) + ((int) payload[3]);
         String id = Integer.toString(idn);
         IPsecGateway gateway = IPsecGatewayBuffer.getGateway(id);
-        if (gateway == null) {
-            // if no match gateway has been added
-            gateway = new IPsecGateway();
-            gateway.setId(id);
-            gateway.setPrivateip(from.toString().substring(1));
-            IPsecGatewayBuffer.add(gateway);
-            LOG.info("New gateway " + gateway.getId() + " from " + gateway.getPrivateip());
-        }
 
         if (payload[4] == STATUS) {
             // 1000 0000 : status
@@ -52,6 +44,16 @@ public class NotificationService {
             } else {
                 // get information
                 try {
+                            
+                    if (gateway == null) {
+                        // if no match gateway has been added
+                        gateway = new IPsecGateway();
+                        gateway.setId(id);
+                        gateway.setPrivateip(from.toString().substring(1));
+                        IPsecGatewayBuffer.add(gateway);
+                        LOG.info("New gateway " + gateway.getId() + " from " + gateway.getPrivateip());
+                    }
+                    
                     String publicIP = Inet4Address.getByAddress(ByteTools.subByteArray(payload, 5, 9)).toString().substring(1);
                     // update gateway info
                     gateway.update(publicIP, from.toString().substring(1), payload[9], payload[10], payload[11]);
@@ -60,6 +62,11 @@ public class NotificationService {
                 }
             }
         } else if (payload[4] == EVENT) {
+        
+            if (gateway == null) {
+                // if no match gateway
+                return;
+            }
             // 0100 0000 : event
             if (payload[5] == EVENT_PACKET) {
                 // 1000 0000 : packet

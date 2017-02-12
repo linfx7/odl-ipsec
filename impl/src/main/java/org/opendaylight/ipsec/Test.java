@@ -21,10 +21,7 @@ import org.opendaylight.ipsec.utils.RuleConflictException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 public class Test {
 
@@ -172,7 +169,7 @@ public class Test {
 
     public static void maain(String[] args) {
 
-        try {
+/*        try {
             Test t = new Test(InetAddress.getByName("10.1.0.0"), (byte)24);
             Map<String, String> mp = new HashMap<String, String>();
             mp.put("src", "123");
@@ -195,7 +192,19 @@ public class Test {
             System.out.println(array.toString());
         } catch (Exception e) {
             e.printStackTrace();
+        }*/
+
+        Vector<String> a = new Vector<>();
+        a.add("123");
+        Iterator<String> unHundled = a.iterator();
+        System.out.println(unHundled.next());
+        System.out.println(unHundled.next());
+        while (unHundled.hasNext()) {
+            System.out.println(unHundled.next());
+            unHundled.remove();
         }
+
+        System.out.println(a.size());
     }
 
 

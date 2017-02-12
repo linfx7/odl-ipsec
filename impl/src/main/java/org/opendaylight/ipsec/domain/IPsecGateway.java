@@ -104,6 +104,11 @@ public class IPsecGateway {
         return issuedRules;
     }
 
+    public List<IPsecRule> getIssuedRules() {
+        return issuedRules;
+    }
+
+/*
     public List<String> getIssuedRules() {
         List<String> rules = new Vector<>();
         for (IPsecRule ir : issuedRules) {
@@ -111,6 +116,7 @@ public class IPsecGateway {
         }
         return rules;
     }
+    */
 
     public void addIssuedRules(IPsecRule rule) {
         issuedRules.add(rule);
