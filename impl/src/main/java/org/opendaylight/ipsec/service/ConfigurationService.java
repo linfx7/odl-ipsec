@@ -35,7 +35,7 @@ public class ConfigurationService {
             IPsecConnection connection = IPsecConnectionBuffer.getActiveByName(connName);
             connection.setLeftsubnet(rule.getSource() + "/" + String.valueOf(rule.getSrcPrefixLen()));
             connection.setRightsubnet(rule.getDestination() + "/" + String.valueOf(rule.getDstPrefixLen()));
-            connName += rule.getSource() + rule.getDestination();
+            connName += rule.getSource().replace('.', '-') + '-' + rule.getDestination().replace('.', '-');
             message = ByteTools.addByteArrays(message, genConnectionBytes(connName + "-a", connection));
         } else if (rule.getAction() == -3) {
             // IPsec connection payload
@@ -43,7 +43,7 @@ public class ConfigurationService {
             IPsecConnection connection = IPsecConnectionBuffer.getActiveByName(connName);
             connection.setLeftsubnet(rule.getSource() + "/" + String.valueOf(rule.getSrcPrefixLen()));
             connection.setRightsubnet(rule.getDestination() + "/" + String.valueOf(rule.getDstPrefixLen()));
-            connName += rule.getSource() + rule.getDestination();
+            connName += rule.getSource().replace('.', '-') + '-' + rule.getDestination().replace('.', '-');
             message = ByteTools.addByteArrays(message, genConnectionBytes(connName + "-a-d", connection));
         }
         // TODO add controller ID
