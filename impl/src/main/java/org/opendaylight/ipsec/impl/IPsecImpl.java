@@ -94,8 +94,12 @@ public class IPsecImpl implements IPsecService {
                 builder.setResult("connectionType cannot be empty");
             } else if (input.getConnectionType().equals("active")) {
                 LOG.info("active connection: " + input.getName());
-                IPsecConnectionBuffer.addActive(input.getName(), connection);
-                builder.setResult("success");
+                if (IPsecConnectionBuffer.getActiveByName(input.getName()) != null) {
+                    builder.setResult("conn already exist");
+                } else {
+                    IPsecConnectionBuffer.addActive(input.getName(), connection);
+                    builder.setResult("success");
+                }
             } else if (input.getConnectionType().equals("passive")) {
                 LOG.info("passive connection: " + input.getName());
                 IPsecConnectionBuffer.addPassive(input.getName(), connection);

@@ -12,6 +12,7 @@ import org.opendaylight.ipsec.communication.IPsecConfigurationSender;
 import org.opendaylight.ipsec.domain.IPsecConnection;
 import org.opendaylight.ipsec.domain.IPsecRule;
 import org.opendaylight.ipsec.utils.ByteTools;
+import sun.security.provider.MD5;
 
 import java.net.InetAddress;
 
@@ -34,6 +35,7 @@ public class ConfigurationService {
             IPsecConnection connection = IPsecConnectionBuffer.getActiveByName(connName);
             connection.setLeftsubnet(rule.getSource() + "/" + String.valueOf(rule.getSrcPrefixLen()));
             connection.setRightsubnet(rule.getDestination() + "/" + String.valueOf(rule.getDstPrefixLen()));
+            connName += rule.getSource() + rule.getDestination();
             message = ByteTools.addByteArrays(message, genConnectionBytes(connName + "-a", connection));
         } else if (rule.getAction() == -3) {
             // IPsec connection payload
@@ -41,6 +43,7 @@ public class ConfigurationService {
             IPsecConnection connection = IPsecConnectionBuffer.getActiveByName(connName);
             connection.setLeftsubnet(rule.getSource() + "/" + String.valueOf(rule.getSrcPrefixLen()));
             connection.setRightsubnet(rule.getDestination() + "/" + String.valueOf(rule.getDstPrefixLen()));
+            connName += rule.getSource() + rule.getDestination();
             message = ByteTools.addByteArrays(message, genConnectionBytes(connName + "-a-d", connection));
         }
         // TODO add controller ID
