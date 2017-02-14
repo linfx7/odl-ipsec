@@ -7,8 +7,6 @@
  */
 package org.opendaylight.ipsec;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.opendaylight.ipsec.buffer.IPsecConnectionBuffer;
 import org.opendaylight.ipsec.buffer.IPsecGatewayBuffer;
 import org.opendaylight.ipsec.buffer.IPsecRuleBuffer;
@@ -19,9 +17,11 @@ import org.opendaylight.ipsec.domain.IPsecRule;
 import org.opendaylight.ipsec.utils.RuleConflictException;
 
 import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 public class Test {
 
@@ -69,8 +69,8 @@ public class Test {
 
         gateway.IssuedRules().add(rule); // should be 10.1.0.0 --> 10.2.2.0
         try {
-            gateway.UnHundledPackets().add(new IPsecRule(InetAddress.getByName("10.1.1.10"), (byte)32,
-                    InetAddress.getByName("10.2.2.20"), (byte)32, 0, ""));
+            gateway.UnHundledPackets().add(new IPsecRule(Inet4Address.getByName("10.1.1.10"), (byte)32,
+                    Inet4Address.getByName("10.2.2.20"), (byte)32, 0, ""));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -208,21 +208,21 @@ public class Test {
     }
 
 
-    InetAddress add;
+    Inet4Address add;
     byte score;
     List<Map<String, String>> result;
 
-    public Test(InetAddress add, byte score) {
+    public Test(Inet4Address add, byte score) {
         this.add = add;
         this.score = score;
         result = new Vector<>();
     }
 
-    public InetAddress getAdd() {
+    public Inet4Address getAdd() {
         return add;
     }
 
-    public void setAdd(InetAddress add) {
+    public void setAdd(Inet4Address add) {
         this.add = add;
     }
 
