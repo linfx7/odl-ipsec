@@ -18,6 +18,7 @@ import org.opendaylight.ipsec.buffer.IPsecRuleBuffer;
 import org.opendaylight.ipsec.domain.IPsecConnection;
 import org.opendaylight.ipsec.domain.IPsecGateway;
 import org.opendaylight.ipsec.domain.IPsecRule;
+import org.opendaylight.ipsec.service.ConfigurationService;
 import org.opendaylight.ipsec.utils.RuleConflictException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ipsec.rev150105.*;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -42,6 +44,9 @@ public class IPsecImpl implements IPsecService {
             InetAddress dstAddress = InetAddress.getByName(input.getDestination());
             IPsecRule rule = new IPsecRule(srcAddress, input.getSrcPrefixLen(), dstAddress, input.getDstPrefixLen(),
                     input.getAction(), input.getConnectionName());
+            if (IPsecConnectionBuffer.getActiveByName(input.getConnectionName()) == null) {
+                throw new RuleConflictException("connection not found");
+            }
             if (input.getPos() != null) {
                 LOG.info("insert rule at " + input.getPos() + ": " + rule.getSource() + " --> " + rule.getDestination());
                 IPsecRuleBuffer.add(input.getPos(), rule);
@@ -63,10 +68,10 @@ public class IPsecImpl implements IPsecService {
                     Rpcs.<RuleAddOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
             return Futures.immediateFuture(rpcResult);
         } catch (RuleConflictException e) {
-            LOG.info("rule conflict");
+            LOG.info(e.getMessage());
             // return error message
             RuleAddOutputBuilder builder = new RuleAddOutputBuilder();
-            builder.setResult("rule conflict");
+            builder.setResult(e.getMessage());
             RpcResult<RuleAddOutput> rpcResult =
                     Rpcs.<RuleAddOutput> getRpcResult(true, builder.build(), Collections.<RpcError> emptySet());
             return Futures.immediateFuture(rpcResult);
@@ -106,81 +111,118 @@ public class IPsecImpl implements IPsecService {
 
     @Override
     public Future<RpcResult<RuleAllOutput>> ruleAll(RuleAllInput input) {
-        int action = input.getAction();
 
-        if (action == -1) {
-            List<IPsecRule> rules = IPsecRuleBuffer.listAll();
-            JSONArray jsonRules = new JSONArray();
-            for (IPsecRule ir : rules) {
-                jsonRules.put(new JSONObject(ir));
-            }
-
-            RuleAllOutputBuilder builder = new RuleAllOutputBuilder();
-            builder.setResult(jsonRules.toString());
-            RpcResult<RuleAllOutput> rpcResult =
-                    Rpcs.<RuleAllOutput>getRpcResult(true, builder.build(), Collections.<RpcError>emptySet());
-            return Futures.immediateFuture(rpcResult);
-        } else {
-            return null;
+        List<IPsecRule> rules = IPsecRuleBuffer.listAll();
+        JSONArray jsonRules = new JSONArray();
+        for (IPsecRule ir : rules) {
+            jsonRules.put(new JSONObject(ir));
         }
+
+        RuleAllOutputBuilder builder = new RuleAllOutputBuilder();
+        builder.setResult(jsonRules.toString());
+        RpcResult<RuleAllOutput> rpcResult =
+                Rpcs.<RuleAllOutput>getRpcResult(true, builder.build(), Collections.<RpcError>emptySet());
+        return Futures.immediateFuture(rpcResult);
+
     }
 
     @Override
     public Future<RpcResult<ConnAllOutput>> connAll(ConnAllInput input) {
-        int action = input.getAction();
 
-        if (action == -1) {
-            Map<String, IPsecConnection> passiveConn = IPsecConnectionBuffer.allPassive();
-            Map<String, IPsecConnection> activeConn = IPsecConnectionBuffer.allActive();
-            JSONArray jsonPassive = new JSONArray();
-            JSONArray jsonActive = new JSONArray();
-            JSONObject result = new JSONObject();
-            try {
-                for (Map.Entry<String, IPsecConnection> entry : passiveConn.entrySet()) {
-                    jsonPassive.put(new JSONObject(entry.getValue()).put("name", entry.getKey()));
-                }
-                for (Map.Entry<String, IPsecConnection> entry : activeConn.entrySet()) {
-                    jsonActive.put(new JSONObject(entry.getValue()).put("name", entry.getKey()));
-                }
-                result.put("passive", jsonPassive);
-                result.put("active", jsonActive);
-            } catch (JSONException e) {
-                e.printStackTrace();
+        Map<String, IPsecConnection> passiveConn = IPsecConnectionBuffer.allPassive();
+        Map<String, IPsecConnection> activeConn = IPsecConnectionBuffer.allActive();
+        JSONArray jsonPassive = new JSONArray();
+        JSONArray jsonActive = new JSONArray();
+        JSONObject result = new JSONObject();
+        try {
+            for (Map.Entry<String, IPsecConnection> entry : passiveConn.entrySet()) {
+                jsonPassive.put(new JSONObject(entry.getValue()).put("name", entry.getKey()));
             }
-
-            ConnAllOutputBuilder builder = new ConnAllOutputBuilder();
-            builder.setResult(result.toString());
-            RpcResult<ConnAllOutput> rpcResult =
-                    Rpcs.<ConnAllOutput>getRpcResult(true, builder.build(), Collections.<RpcError>emptySet());
-            return Futures.immediateFuture(rpcResult);
-        } else {
-            return null;
+            for (Map.Entry<String, IPsecConnection> entry : activeConn.entrySet()) {
+                jsonActive.put(new JSONObject(entry.getValue()).put("name", entry.getKey()));
+            }
+            result.put("passive", jsonPassive);
+            result.put("active", jsonActive);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+        ConnAllOutputBuilder builder = new ConnAllOutputBuilder();
+        builder.setResult(result.toString());
+        RpcResult<ConnAllOutput> rpcResult =
+                Rpcs.<ConnAllOutput>getRpcResult(true, builder.build(), Collections.<RpcError>emptySet());
+        return Futures.immediateFuture(rpcResult);
     }
 
     @Override
     public Future<RpcResult<GatewayAllOutput>> gatewayAll(GatewayAllInput input) {
-        int action = input.getAction();
 
-        if (action == -1) {
-            List<IPsecGateway> gateways = IPsecGatewayBuffer.getGateways();
-            JSONArray jsonGateways = new JSONArray();
-            for (IPsecGateway ig : gateways) {
-                try {
-                    jsonGateways.put(new JSONObject(ig).put("unHundledPackets", new JSONArray(ig.getUnHundledPackets())));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+        List<IPsecGateway> gateways = IPsecGatewayBuffer.getGateways();
+        JSONArray jsonGateways = new JSONArray();
+        for (IPsecGateway ig : gateways) {
+            try {
+                jsonGateways.put(new JSONObject(ig).put("unHundledPackets", new JSONArray(ig.getUnHundledPackets())));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        GatewayAllOutputBuilder builder = new GatewayAllOutputBuilder();
+        builder.setResult(jsonGateways.toString());
+        RpcResult<GatewayAllOutput> rpcResult =
+                Rpcs.<GatewayAllOutput>getRpcResult(true, builder.build(), Collections.<RpcError>emptySet());
+        return Futures.immediateFuture(rpcResult);
+    }
+
+    @Override
+    public Future<RpcResult<RuleDelOutput>> ruleDel(RuleDelInput input) {
+
+        int position = input.getPosition();
+        IPsecRule rule = IPsecRuleBuffer.get(position);
+        rule.setAction(-3);
+        for (IPsecGateway ig : IPsecGatewayBuffer.getGateways()) {
+            Iterator<IPsecRule> iterator = ig.IssuedRules().iterator();
+            while (iterator.hasNext()) {
+                IPsecRule ir = iterator.next();
+                if (ir == rule) {
+                    // down the connection
+                    try {
+                        ConfigurationService.issueConfiguration(
+                                InetAddress.getByName(ig.getPrivateip()), rule);
+                    } catch (UnknownHostException e) {
+                        // impossible
+                    }
+                    // remove the rule from gateway
+                    iterator.remove();
                 }
             }
-
-            GatewayAllOutputBuilder builder = new GatewayAllOutputBuilder();
-            builder.setResult(jsonGateways.toString());
-            RpcResult<GatewayAllOutput> rpcResult =
-                    Rpcs.<GatewayAllOutput>getRpcResult(true, builder.build(), Collections.<RpcError>emptySet());
-            return Futures.immediateFuture(rpcResult);
-        } else {
-            return null;
         }
+
+        RuleDelOutputBuilder builder = new RuleDelOutputBuilder();
+        builder.setResult("success");
+        RpcResult<RuleDelOutput> rpcResult =
+                Rpcs.<RuleDelOutput>getRpcResult(true, builder.build(), Collections.<RpcError>emptySet());
+        return Futures.immediateFuture(rpcResult);
+    }
+
+    @Override
+    public Future<RpcResult<ConnDelOutput>> connDel(ConnDelInput input) {
+
+        String name = input.getName();
+        String result = "";
+        if (IPsecRuleBuffer.isConnectionUsed(name)) {
+            // there are still some rules using the connection
+            result = "in use";
+        } else {
+            IPsecConnectionBuffer.removeActive(name);
+            result = "success";
+        }
+
+        ConnDelOutputBuilder builder = new ConnDelOutputBuilder();
+        builder.setResult(result);
+        RpcResult<ConnDelOutput> rpcResult =
+                Rpcs.<ConnDelOutput>getRpcResult(true, builder.build(), Collections.<RpcError>emptySet());
+        return Futures.immediateFuture(rpcResult);
     }
 
 }

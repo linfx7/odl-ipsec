@@ -106,8 +106,18 @@ module IPsec {
 
     rpc conn-all {
         input {
-            leaf action {
-                type int32;
+        }
+        output {
+            leaf result {
+                type string;
+            }
+        }
+    }
+
+    rpc conn-del {
+        input {
+            leaf name {
+                type string;
             }
         }
         output {
@@ -133,7 +143,17 @@ module IPsec {
 
     rpc rule-all {
         input {
-            leaf action {
+        }
+        output {
+            leaf result {
+                type string;
+            }
+        }
+    }
+
+    rpc rule-del {
+        input {
+            leaf position {
                 type int32;
             }
         }
@@ -146,9 +166,6 @@ module IPsec {
 
     rpc gateway-all {
         input {
-            leaf action {
-                type int32;
-            }
         }
         output {
             leaf result {

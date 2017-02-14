@@ -34,7 +34,14 @@ public class ConfigurationService {
             IPsecConnection connection = IPsecConnectionBuffer.getActiveByName(connName);
             connection.setLeftsubnet(rule.getSource() + "/" + String.valueOf(rule.getSrcPrefixLen()));
             connection.setRightsubnet(rule.getDestination() + "/" + String.valueOf(rule.getDstPrefixLen()));
-            message = ByteTools.addByteArrays(message, genConnectionBytes(connName, connection));
+            message = ByteTools.addByteArrays(message, genConnectionBytes(connName + "-a", connection));
+        } else if (rule.getAction() == -3) {
+            // IPsec connection payload
+            String connName = rule.getConnectionName();
+            IPsecConnection connection = IPsecConnectionBuffer.getActiveByName(connName);
+            connection.setLeftsubnet(rule.getSource() + "/" + String.valueOf(rule.getSrcPrefixLen()));
+            connection.setRightsubnet(rule.getDestination() + "/" + String.valueOf(rule.getDstPrefixLen()));
+            message = ByteTools.addByteArrays(message, genConnectionBytes(connName + "-a-d", connection));
         }
         // TODO add controller ID
 
@@ -51,7 +58,7 @@ public class ConfigurationService {
 
     private static byte[] genConnectionBytes(String connName, IPsecConnection connection) {
         // add "-a" suffix
-        byte[] connBytes = connection.toByteArray(connName + "-a");
+        byte[] connBytes = connection.toByteArray(connName);
         // len < 2048
         int len = connBytes.length;
         // 1 + 2 : element type, len high 8 bits, len low 8 bits

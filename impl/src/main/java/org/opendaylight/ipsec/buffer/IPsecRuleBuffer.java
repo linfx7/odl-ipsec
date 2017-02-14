@@ -87,6 +87,10 @@ public class IPsecRuleBuffer {
         }
     }
 
+    public static IPsecRule get(int position) {
+        return rules.get(position);
+    }
+
     public static void add(IPsecRule rule) throws RuleConflictException {
         if (isConflict(rule)) {
             throw new RuleConflictException("conflict");
@@ -135,5 +139,19 @@ public class IPsecRuleBuffer {
                 return rule;
         }
         return null;
+    }
+
+    /**
+     * Check whether a connection is used
+     * @param connectionName connection name
+     * @return true for
+     */
+    public static boolean isConnectionUsed(String connectionName) {
+        for (IPsecRule ir : rules) {
+            if (ir.getAction() == 0 && ir.getConnectionName().equals(connectionName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
