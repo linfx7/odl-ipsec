@@ -88,7 +88,11 @@ public class IPsecRuleBuffer {
     }
 
     public static IPsecRule get(int position) {
-        return rules.get(position);
+        if (position >= rules.size()) {
+            return null;
+        } else {
+            return rules.get(position);
+        }
     }
 
     public static void add(IPsecRule rule) throws RuleConflictException {

@@ -179,25 +179,27 @@ public class IPsecImpl implements IPsecService {
 
         int position = input.getPosition();
         IPsecRule rule = IPsecRuleBuffer.get(position);
-        rule.setAction(-3);
-        for (IPsecGateway ig : IPsecGatewayBuffer.getGateways()) {
-            Iterator<IPsecRule> iterator = ig.IssuedRules().iterator();
-            while (iterator.hasNext()) {
-                IPsecRule ir = iterator.next();
-                if (ir == rule) {
-                    // down the connection
-                    try {
-                        ConfigurationService.issueConfiguration(
-                                InetAddress.getByName(ig.getPrivateip()), rule);
-                    } catch (UnknownHostException e) {
-                        // impossible
+        if (rule != null) {
+            rule.setAction(-3);
+            for (IPsecGateway ig : IPsecGatewayBuffer.getGateways()) {
+                Iterator<IPsecRule> iterator = ig.IssuedRules().iterator();
+                while (iterator.hasNext()) {
+                    IPsecRule ir = iterator.next();
+                    if (ir == rule) {
+                        // down the connection
+                        try {
+                            ConfigurationService.issueConfiguration(
+                                    InetAddress.getByName(ig.getPrivateip()), rule);
+                        } catch (UnknownHostException e) {
+                            // impossible
+                        }
+                        // remove the rule from gateway
+                        iterator.remove();
                     }
-                    // remove the rule from gateway
-                    iterator.remove();
                 }
             }
+            IPsecRuleBuffer.remove(position);
         }
-        IPsecRuleBuffer.remove(position);
 
         RuleDelOutputBuilder builder = new RuleDelOutputBuilder();
         builder.setResult("success");
