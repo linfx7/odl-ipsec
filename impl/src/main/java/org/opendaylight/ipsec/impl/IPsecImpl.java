@@ -197,6 +197,7 @@ public class IPsecImpl implements IPsecService {
                 }
             }
         }
+        IPsecRuleBuffer.remove(position);
 
         RuleDelOutputBuilder builder = new RuleDelOutputBuilder();
         builder.setResult("success");
